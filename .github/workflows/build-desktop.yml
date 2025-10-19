@@ -1,0 +1,58 @@
+name: Build Desktop
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: |
+          cd apps/desktop
+          npm ci
+      
+      - name: Build
+        run: |
+          cd apps/desktop
+          npm run package:mac
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-build
+          path: apps/desktop/release/*.dmg
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: |
+          cd apps/desktop
+          npm ci
+      
+      - name: Build
+        run: |
+          cd apps/desktop
+          npm run package:win
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: apps/desktop/release/*.exe

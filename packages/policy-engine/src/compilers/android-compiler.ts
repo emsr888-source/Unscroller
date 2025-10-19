@@ -1,0 +1,99 @@
+import { ProviderPolicy, AndroidCompiledRules, DomRules } from '../types';
+import { patternToRegExp } from '../utils/patterns';
+
+export class AndroidCompiler {
+  /**
+   * Compile provider policy to Android WebView rules
+   */
+  static compile(providerPolicy: ProviderPolicy, filterMode?: string): AndroidCompiledRules {
+    const blockUrls = [...providerPolicy.block];
+
+    // Add filter mode URLs
+    if (providerPolicy.filterModes && filterMode) {
+      const mode = providerPolicy.filterModes[filterMode];
+      if (mode?.blockUrls) {
+        blockUrls.push(...mode.blockUrls);
+      }
+    }
+
+    const domScript = this.buildDOMScript(providerPolicy.dom, filterMode);
+    const allowPatterns = providerPolicy.allow.map(patternToRegExp);
+    const blockPatterns = providerPolicy.block.map(patternToRegExp);
+
+    return {
+      blockUrls,
+      allowPatterns,
+      blockPatterns,
+      domScript,
+      startURL: providerPolicy.start,
+    };
+  }
+
+  /**
+   * Build JavaScript for DOM manipulation
+   */
+  private static buildDOMScript(dom?: DomRules, filterMode?: string): string {
+    return `
+(function() {
+  'use strict';
+  
+  const CM = {
+    hideSelectors: ${JSON.stringify(dom?.hide || [])},
+    disabledAnchors: ${JSON.stringify(dom?.disableAnchorsTo || [])},
+    
+    init() {
+      this.hideElements();
+      this.disableAnchors();
+      this.observeMutations();
+      ${dom?.script || ''}
+    },
+    
+    hideElements() {
+      this.hideSelectors.forEach(selector => {
+        try {
+          document.querySelectorAll(selector).forEach(el => {
+            el.style.display = 'none';
+            el.setAttribute('data-cm-hidden', 'true');
+          });
+        } catch (e) {
+          console.warn('[CM] Failed to hide:', selector, e);
+        }
+      });
+    },
+    
+    disableAnchors() {
+      this.disabledAnchors.forEach(path => {
+        try {
+          document.querySelectorAll(\`a[href^="\${path}"]\`).forEach(el => {
+            el.addEventListener('click', e => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (window.CreatorMode) {
+                window.CreatorMode.onBlockedNavigation(path);
+              }
+            }, true);
+          });
+        } catch (e) {
+          console.warn('[CM] Failed to disable anchors:', path, e);
+        }
+      });
+    },
+    
+    observeMutations() {
+      const observer = new MutationObserver(() => {
+        this.hideElements();
+        this.disableAnchors();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+  };
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => CM.init());
+  } else {
+    CM.init();
+  }
+})();
+`;
+  }
+}

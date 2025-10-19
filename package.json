@@ -1,0 +1,37 @@
+{
+  "name": "creator-mode",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Creator Mode - Distraction-Free Social Browser",
+  "packageManager": "npm@10.2.4",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "policy/signer"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "mobile": "cd apps/mobile && npm start",
+    "desktop": "cd apps/desktop && npm run dev",
+    "backend": "cd apps/backend && npm run start:dev",
+    "desktop:rebuild:dev": "npm run rebuild:dev --workspace=@creator-mode/desktop",
+    "desktop:release": "npm run rebuild:release --workspace=@creator-mode/desktop",
+    "desktop:package:all": "npm run package:all --workspace=@creator-mode/desktop",
+    "policy:sign": "cd policy && npm run sign"
+  },
+  "devDependencies": {
+    "babel-plugin-module-resolver": "^5.0.2",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

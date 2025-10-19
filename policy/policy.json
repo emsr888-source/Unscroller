@@ -1,0 +1,387 @@
+{
+  "version": "1.9.0",
+  "youtubeFilterMode": "safe",
+  "providers": {
+    "instagram": {
+      "start": "https://www.instagram.com/direct/inbox/",
+      "allow": [
+        "*://instagram.com/direct/inbox/*",
+        "*://www.instagram.com/direct/inbox/*",
+        "*://instagram.com/direct/t/*",
+        "*://www.instagram.com/direct/t/*",
+        "*://instagram.com/accounts/edit/*",
+        "*://www.instagram.com/accounts/edit/*",
+        "*://instagram.com/accounts/creator/*",
+        "*://www.instagram.com/accounts/creator/*",
+        "*://instagram.com/accounts/password/*",
+        "*://www.instagram.com/accounts/password/*",
+        "*://instagram.com/accounts/settings/*",
+        "*://www.instagram.com/accounts/settings/*",
+        "*://instagram.com/p/create/*",
+        "*://www.instagram.com/p/create/*",
+        "*://instagram.com/create/*",
+        "*://www.instagram.com/create/*",
+        "*://instagram.com/create/select/*",
+        "*://www.instagram.com/create/select/*",
+        "*://instagram.com/accounts/activity/*",
+        "*://www.instagram.com/accounts/activity/*",
+        "*://instagram.com/notifications/*",
+        "*://www.instagram.com/notifications/*",
+        "*://instagram.com/your_activity/*",
+        "*://www.instagram.com/your_activity/*",
+        "*://instagram.com/accounts/business/*",
+        "*://www.instagram.com/accounts/business/*",
+        "*://instagram.com/accounts/settings/*",
+        "*://www.instagram.com/accounts/settings/*",
+        "*://instagram.com/accounts/creator_tools/*",
+        "*://www.instagram.com/accounts/creator_tools/*",
+        "*://instagram.com/professional_dashboard/*",
+        "*://www.instagram.com/professional_dashboard/*",
+        "*://instagram.com/insights/*",
+        "*://www.instagram.com/insights/*",
+        "*://instagram.com/accounts/insights/*",
+        "*://www.instagram.com/accounts/insights/*",
+        "*://instagram.com/accounts/login/*",
+        "*://www.instagram.com/accounts/login/*",
+        "*://instagram.com/login/*",
+        "*://www.instagram.com/login/*",
+        "*://instagram.com/api/*",
+        "*://www.instagram.com/api/*",
+        "*://instagram.com/graphql*",
+        "*://www.instagram.com/graphql*",
+        "*://instagram.com/ajax/*",
+        "*://www.instagram.com/ajax/*",
+        "*://instagram.com/static/*",
+        "*://www.instagram.com/static/*",
+        "*://instagram.com/rsrc.php*",
+        "*://www.instagram.com/rsrc.php*",
+        "*://*.cdninstagram.com/*",
+        "*://business.instagram.com/*",
+        "*://*.fbcdn.net/*",
+        "*://static.xx.fbcdn.net/*",
+        "*://connect.facebook.net/*",
+        "*://edge-chat.instagram.com/*",
+        "*://gateway.instagram.com/*",
+        "wss://edge-chat.instagram.com/*",
+        "wss://gateway.instagram.com/*"
+      ],
+      "block": [
+        "*://instagram.com/?*",
+        "*://www.instagram.com/?*",
+        "/explore",
+        "/explore/",
+        "/explore/.*",
+        "/search",
+        "/search/",
+        "/search/.*",
+        "/reels",
+        "/reels/",
+        "/reels/.*",
+        "/reel/",
+        "/reel/.*",
+        "/p/",
+        "/p/.*",
+        "/tv/",
+        "/tv/.*",
+        "/stories/",
+        "/stories/.*",
+        "/foryou",
+        "/foryou/",
+        "/foryou/.*",
+        "/following",
+        "/following/",
+        "/following/.*",
+        "/feed/",
+        "/feed/.*",
+        "/timeline",
+        "/timeline/",
+        "/timeline/.*",
+        "graphql.*feed",
+        "graphql.*timeline",
+        "graphql.*suggested",
+        "graphql.*explore",
+        "graphql.*search",
+        "/suggested_users",
+        "/suggested_users/",
+        "/suggested_users/.*",
+        "/suggested",
+        "/suggested/",
+        "/suggested/.*",
+        "/tags",
+        "/tags/",
+        "/tags/.*",
+        "/locations",
+        "/locations/",
+        "/locations/.*",
+        "/ads",
+        "/ads/",
+        "/ads/.*",
+        "/video/",
+        "/video/.*"
+      ],
+      "dom": {
+        "hide": [
+          "a[href='/']",
+          "a[href^='/explore']",
+          "a[href^='/search']",
+          "a[href^='/reels']",
+          "a[href^='/tv']",
+          "a[href^='/stories']",
+          "a[href^='/foryou']",
+          "a[href^='/following']",
+          "[role='tablist'] a[href='/']",
+          "[aria-label*='Home']",
+          "[aria-label*='Explore']",
+          "[aria-label*='Search']",
+          "[aria-label*='Reels']",
+          "[aria-label*='Stories']",
+          "[aria-label*='For You']",
+          "[aria-label*='Following']",
+          "[data-testid='feed-container']",
+          "[data-testid='explore-grid']",
+          "[data-testid='search-container']"
+        ],
+        "disableAnchorsTo": [
+          "/",
+          "/explore",
+          "/explore/",
+          "/search",
+          "/search/",
+          "/tv",
+          "/tv/",
+          "/stories",
+          "/stories/",
+          "/foryou",
+          "/foryou/",
+          "/following",
+          "/following/"
+        ],
+        "script": "if (window.location.pathname === '/' || window.location.pathname === '') { window.location.href = '/direct/inbox/'; }"
+      },
+      "quick": {
+        "dm": "https://www.instagram.com/direct/inbox/",
+        "compose": "https://www.instagram.com/p/create/",
+        "profile": "https://www.instagram.com/accounts/edit/",
+        "notifications": "https://www.instagram.com/notifications/"
+      }
+    },
+    "x": {
+      "start": "https://x.com/messages",
+      "allow": [
+        "^/messages/?$",
+        "^/compose/tweet/?$",
+        "^/settings/profile/?$",
+        "^/notifications(?:/mentions)?/?$",
+        "^/[A-Za-z0-9_]{1,15}(?:/(with_replies|media|likes))?/?$"
+      ],
+      "block": [
+        "^/?$",
+        "^/home/?$",
+        "^/explore/?$",
+        "^/i/spaces(?:/.*)?$"
+      ],
+      "dom": {
+        "hide": [
+          "a[href='/home']",
+          "a[href='/explore']"
+        ],
+        "disableAnchorsTo": [
+          "/home",
+          "/explore"
+        ]
+      },
+      "quick": {
+        "dm": "https://x.com/messages",
+        "compose": "https://x.com/compose/tweet",
+        "profile": "https://x.com/settings/profile",
+        "notifications": "https://x.com/notifications"
+      }
+    },
+    "youtube": {
+      "start": "https://m.youtube.com/feed/subscriptions",
+      "allow": [
+        "^/upload/?$",
+        "^/channel/.*$",
+        "^/feed/library/?$",
+        "^/results.*$",
+        "^/watch.*$"
+      ],
+      "block": [
+        "^/?$",
+        "^/shorts/.*$"
+      ],
+      "dom": {
+        "hide": [
+          "a[title='Shorts']",
+          "a[title*='Shorts']",
+          "a[href*='/shorts']",
+          "ytd-reel-shelf-renderer",
+          "ytd-rich-shelf-renderer:has([title*='Shorts'])",
+          "#shorts-container",
+          "ytm-reel-shelf-renderer",
+          "ytm-shorts-lockup-view-model",
+          "[title*='#shorts']",
+          "[aria-label*='Shorts']",
+          "ytd-guide-entry-renderer:has([title='Shorts'])",
+          "ytm-pivot-bar-item-renderer:has([aria-label*='Shorts'])",
+          ".shorts-shelf",
+          "[id*='shorts']"
+        ],
+        "script": "window.__CM_blockShorts=true;",
+        "disableAnchorsTo": [
+          "/shorts",
+          "/shorts/"
+        ]
+      },
+      "filterModes": {
+        "safe": {
+          "blockUrls": [
+            "*://googleads.g.doubleclick.net/*",
+            "*://*.doubleclick.net/*",
+            "*://*.youtube.com/pagead/*",
+            "*://*.youtube.com/api/stats/ads/*"
+          ],
+          "hideSelectors": [
+            ".ytd-display-ad-renderer",
+            "#player-ads",
+            "ytd-promoted-video-renderer",
+            "ytd-ad-slot-renderer",
+            "ytd-action-companion-ad-renderer",
+            "#masthead-ad",
+            "ytd-engagement-panel-section-list-renderer[visibility='ENGAGEMENT_PANEL_VISIBILITY_EXPANDED']"
+          ]
+        }
+      },
+      "quick": {
+        "compose": "https://m.youtube.com/upload",
+        "profile": "https://m.youtube.com/channel/UC",
+        "notifications": "https://m.youtube.com/feed/history"
+      }
+    },
+    "tiktok": {
+      "start": "https://www.tiktok.com/upload",
+      "allow": [
+        "*://tiktok.com/upload*",
+        "*://www.tiktok.com/upload*",
+        "*://tiktok.com/creator-center*",
+        "*://www.tiktok.com/creator-center*",
+        "*://tiktok.com/login*",
+        "*://www.tiktok.com/login*",
+        "*://tiktok.com/signup*",
+        "*://www.tiktok.com/signup*",
+        "*://tiktok.com/passport/web/login*",
+        "*://www.tiktok.com/passport/web/login*",
+        "*://tiktok.com/passport/web/register*",
+        "*://www.tiktok.com/passport/web/register*",
+        "*://tiktok.com/login*",
+        "*://www.tiktok.com/login*",
+        "*://libraweb-sg.tiktok.com/*",
+        "*://mssdk-sg.tiktok.com/*",
+        "*://tiktok.com/@*",
+        "*://www.tiktok.com/@*",
+        "*://tiktok.com/settings*",
+        "*://www.tiktok.com/settings*",
+        "*://tiktok.com/api/*",
+        "*://www.tiktok.com/api/*",
+        "*://tiktok.com/passport/*",
+        "*://www.tiktok.com/passport/*",
+        "*://tiktok.com/ttwid/*",
+        "*://www.tiktok.com/ttwid/*",
+        "*://*.tiktokcdn.com/*",
+        "*://*.ttwstatic.com/*"
+      ],
+      "block": [
+        "^https?://(?:www\\.)?tiktok\\.com/?$",
+        "^https?://(?:www\\.)?tiktok\\.com/\\?.*$",
+        "^https?://tiktok\\.com/?$",
+        "^https?://tiktok\\.com/\\?.*$",
+        "/foryou",
+        "/foryou/.*",
+        "/following",
+        "/following/.*",
+        "/@[^/]+/video/.*",
+        "/discover",
+        "/discover/.*",
+        "/search",
+        "/search/.*",
+        "/tag/.*",
+        "/music/.*",
+        "/trending",
+        "/trending/.*",
+        "/live"
+      ],
+      "dom": {
+        "hide": [
+          "a[href='/foryou']",
+          "a[href='/discover']",
+          "a[href='/following']",
+          "a[href*='/video/']",
+          "[data-e2e='nav-foryou']",
+          "[data-e2e='nav-following']",
+          "[aria-label*='For You']",
+          "[aria-label*='Following']"
+        ],
+        "disableAnchorsTo": [
+          "/foryou",
+          "/discover",
+          "/following",
+          "/search",
+          "/tag/"
+        ]
+      },
+      "quick": {
+        "dm": "https://www.tiktok.com/messages",
+        "compose": "https://www.tiktok.com/upload",
+        "profile": "https://www.tiktok.com/@username",
+        "notifications": "https://www.tiktok.com/notifications"
+      }
+    },
+    "facebook": {
+      "start": "https://m.facebook.com/me",
+      "allow": [
+        "^/me/?$",
+        "^/profile\\.php.*$",
+        "^/pages/.*$",
+        "^/composer/.*$",
+        "^/messages/t/.*$",
+        "^/notifications.*$",
+        "^/settings.*$"
+      ],
+      "block": [
+        "^/?$",
+        "^/home\\.php$",
+        "^/\\?$",
+        "^/\\?sk=.*$",
+        "^/watch(?:/.*)?$",
+        "^/videos?(?:/.*)?$",
+        "^/reel(?:s)?(?:/.*)?$",
+        "^/stories(?:/.*)?$",
+        "^/search(?:/.*)?$"
+      ],
+      "dom": {
+        "hide": [
+          "[role='feed']",
+          "a[href*='/watch']",
+          "a[href*='/videos']",
+          "a[href*='/reel']",
+          "a[href*='/stories']",
+          "a[href^='/search']"
+        ],
+        "disableAnchorsTo": [
+          "/home.php",
+          "/watch",
+          "/videos",
+          "/reel",
+          "/stories",
+          "/search"
+        ]
+      },
+      "quick": {
+        "dm": "https://m.facebook.com/messages/",
+        "compose": "https://m.facebook.com/composer/",
+        "profile": "https://m.facebook.com/me",
+        "notifications": "https://m.facebook.com/notifications"
+      }
+    }
+  }
+}
