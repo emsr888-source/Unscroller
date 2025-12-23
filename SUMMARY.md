@@ -1,4 +1,4 @@
-# 🎉 Creator Mode - All Issues Fixed!
+# 🎉 Unscroller - All Issues Fixed!
 
 ## ✅ **Status: 100% Complete**
 
@@ -164,7 +164,7 @@ npm test
 # 1. Check backend starts
 cd apps/backend
 npm run start:dev
-# Should see: 🚀 Creator Mode Backend running on http://localhost:3000
+# Should see: 🚀 Unscroller Backend running on http://localhost:3000
 
 # 2. Test policy endpoint
 curl http://localhost:3000/api/policy
@@ -211,7 +211,7 @@ curl http://localhost:3000/api/ai/openai-usage
 - Production-ready
 - Well-documented
 
-**Your Creator Mode app is ready to launch!** 🚀
+**Your Unscroller app is ready to launch!** 🚀
 
 ---
 

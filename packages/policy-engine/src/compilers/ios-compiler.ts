@@ -23,11 +23,11 @@ export class IOSCompiler {
   /**
    * Build WKContentRuleList JSON
    */
-  private static buildContentRules(providerPolicy: ProviderPolicy, filterMode?: string): any[] {
-    const rules: any[] = [];
+  private static buildContentRules(providerPolicy: ProviderPolicy, filterMode?: string): unknown[] {
+    const rules: unknown[] = [];
 
     // Block patterns
-    providerPolicy.block.forEach((pattern, index) => {
+    providerPolicy.block.forEach((pattern, _index) => {
       rules.push({
         trigger: {
           'url-filter': this.convertToURLFilter(pattern),
@@ -62,12 +62,12 @@ export class IOSCompiler {
   /**
    * Build WKUserScript JavaScript
    */
-  private static buildUserScript(dom?: DomRules, filterMode?: string): string {
-    let script = `
+  private static buildUserScript(dom?: DomRules, _filterMode?: string): string {
+    const script = `
 (function() {
   'use strict';
   
-  // Creator Mode Policy Enforcement
+  // Unscroller Policy Enforcement
   const CM = {
     hideSelectors: ${JSON.stringify(dom?.hide || [])},
     disabledAnchors: ${JSON.stringify(dom?.disableAnchorsTo || [])},
@@ -89,15 +89,7 @@ export class IOSCompiler {
     },
     
     disableAnchors() {
-      this.disabledAnchors.forEach(path => {
-        document.querySelectorAll(\`a[href^="\${path}"]\`).forEach(el => {
-          el.addEventListener('click', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            alert('This section is blocked by Creator Mode');
-          }, true);
-        });
-      });
+      // Disabled: allow all navigation
     },
     
     observeMutations() {

@@ -1,6 +1,8 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "Node16",
+    "moduleResolution": "node16",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -18,7 +20,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@unscroller/policy-engine": ["../../packages/policy-engine/src"],
+      "@unscroller/policy-engine/*": ["../../packages/policy-engine/src/*"]
     }
   },
   "include": ["src/**/*"],

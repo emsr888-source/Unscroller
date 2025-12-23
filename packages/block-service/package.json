@@ -1,0 +1,25 @@
+{
+  "name": "@unscroller/block-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "React Native TurboModule bridges for OS-wide app blocking and screen-time telemetry.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist",
+    "dev": "tsc -p tsconfig.json --watch",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-native": "0.81.5"
+  },
+  "devDependencies": {
+    "@react-native/typescript-config": "^0.74.88",
+    "@types/react": "^19",
+    "@types/react-native": "^0.73.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.0"
+  }
+}

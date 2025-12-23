@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🔍 Creator Mode - Setup Verification"
+echo "🔍 Unscroller - Setup Verification"
 echo "======================================"
 echo ""
 

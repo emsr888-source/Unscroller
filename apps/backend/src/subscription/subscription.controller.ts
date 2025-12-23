@@ -1,7 +1,10 @@
-import { Controller, Post, Get, Body, UseGuards, Req, Headers, RawBodyRequest } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Req, Headers, BadRequestException } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import Stripe from 'stripe';
+import { Request } from 'express';
+
+type RequestWithRawBody<T = Request> = T & { rawBody?: Buffer };
 
 @Controller('api')
 export class SubscriptionController {
@@ -17,17 +20,14 @@ export class SubscriptionController {
   @UseGuards(JwtAuthGuard)
   async verifyReceipt(@Req() req, @Body() body: any) {
     const userId = req.user.id;
-    const { platform, customerInfo } = body;
+    const { platform, purchase } = body;
 
-    if (platform === 'ios') {
-      const subscription = await this.subscriptionService.verifyIOSReceipt(userId, customerInfo);
-      return { success: true, subscription };
-    } else if (platform === 'android') {
-      const subscription = await this.subscriptionService.verifyAndroidReceipt(userId, customerInfo);
-      return { success: true, subscription };
+    if (!platform || !purchase) {
+      throw new BadRequestException('Missing platform or purchase payload');
     }
 
-    return { success: false, error: 'Invalid platform' };
+    const subscription = await this.subscriptionService.verifyReceipt({ userId, platform, purchase });
+    return { success: true, subscription };
   }
 
   @Post('subscription/checkout')
@@ -56,7 +56,7 @@ export class SubscriptionController {
   @Post('webhooks/stripe')
   async handleStripeWebhook(
     @Headers('stripe-signature') signature: string,
-    @Req() req: RawBodyRequest<Request>,
+    @Req() req: RequestWithRawBody<Request>,
   ) {
     try {
       // Verify webhook signature

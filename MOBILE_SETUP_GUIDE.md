@@ -36,7 +36,7 @@
 Once Xcode is installed:
 
 ```bash
-cd /Users/onalime/CreatorMode
+cd /Users/onalime/Unscroller
 ./setup-ios.sh
 ```
 
@@ -50,7 +50,7 @@ This script will:
 ### Step 3: Run iOS App
 
 ```bash
-cd /Users/onalime/CreatorMode/apps/mobile
+cd /Users/onalime/Unscroller/apps/mobile
 npm run ios
 ```
 
@@ -112,7 +112,7 @@ Once installed, it will be at: `/Applications/Android Studio.app`
 ### Step 4: Run Android Setup Script
 
 ```bash
-cd /Users/onalime/CreatorMode
+cd /Users/onalime/Unscroller
 ./setup-android.sh
 ```
 
@@ -141,7 +141,7 @@ emulator -avd Pixel_6_API_34 &
 
 **Then run the app:**
 ```bash
-cd /Users/onalime/CreatorMode/apps/mobile
+cd /Users/onalime/Unscroller/apps/mobile
 npm run android
 ```
 
@@ -192,7 +192,7 @@ pod --version
 
 ### iOS (Simulator)
 ```bash
-cd /Users/onalime/CreatorMode/apps/mobile
+cd /Users/onalime/Unscroller/apps/mobile
 npm run ios
 ```
 
@@ -209,13 +209,24 @@ npm run ios -- --device "Your iPhone Name"
 
 ### Android (Emulator)
 ```bash
-cd /Users/onalime/CreatorMode/apps/mobile
+cd /Users/onalime/Unscroller/apps/mobile
 
 # Make sure AVD is running first!
 npm run android
 ```
 
 **First build takes 10-15 minutes.** Subsequent builds are faster.
+
+> 💡 **Need Chrome DevTools to pop open automatically?**
+>
+> Use the helper script that starts Metro in experimental debugger mode, opens the Chrome tabs, and runs the Android install without spawning a second packager:
+>
+> ```bash
+> cd /Users/onalime/Unscroller
+> ./scripts/start-mobile-debug.sh
+> ```
+>
+> Keep that terminal open while debugging. When finished, press **Ctrl+C** to stop Metro.
 
 ### Android (Physical Device)
 
@@ -235,7 +246,7 @@ npm run android
 
 5. **Run app:**
    ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile
+   cd /Users/onalime/Unscroller/apps/mobile
    npm run android
    ```
 
@@ -355,7 +366,7 @@ watchman watch-del-all
 Run this to check your setup status:
 
 ```bash
-cd /Users/onalime/CreatorMode
+cd /Users/onalime/Unscroller
 ./verify-setup.sh
 ```
 

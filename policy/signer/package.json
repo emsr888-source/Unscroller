@@ -1,5 +1,5 @@
 {
-  "name": "@creator-mode/policy-signer",
+  "name": "@unscroller/policy-signer",
   "version": "1.0.0",
   "main": "dist/index.js",
   "bin": {
@@ -7,10 +7,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "sign": "node dist/cli.js"
+    "sign": "npm run build && node dist/cli.js sign --input ../policy.json --output ./signed-policy.json --public-key ./public-key.pem"
   },
   "dependencies": {
-    "@creator-mode/policy-engine": "*",
+    "@unscroller/policy-engine": "*",
     "commander": "^11.1.0"
   },
   "devDependencies": {

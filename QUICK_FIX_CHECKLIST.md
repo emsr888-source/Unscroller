@@ -1,4 +1,4 @@
-# Creator Mode - Quick Fix Checklist
+# Unscroller - Quick Fix Checklist
 
 **Status:** Issues identified, ready to fix  
 **Estimated Time:** 2-3 days for critical items
@@ -74,7 +74,7 @@ export const CONFIG = {
     ? Platform.OS === 'ios' 
       ? 'http://localhost:3000'  // iOS simulator
       : 'http://10.0.2.2:3000'   // Android emulator
-    : process.env.REACT_APP_API_URL || 'https://api.creatormode.app',
+    : process.env.REACT_APP_API_URL || 'https://api.unscroller.app',
   
   SUPABASE_URL: process.env.REACT_APP_SUPABASE_URL,
   SUPABASE_KEY: process.env.REACT_APP_SUPABASE_KEY,

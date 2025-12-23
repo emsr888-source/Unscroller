@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.9.7",
   "youtubeFilterMode": "safe",
   "providers": {
     "instagram": {
@@ -166,7 +166,8 @@
         ".*(?:x|twitter)\\.com/i/bookmarks/.*",
         ".*api\\.x\\.com.*",
         ".*abs\\.twimg\\.com.*",
-        ".*pbs\\.twimg\\.com.*"
+        ".*pbs\\.twimg\\.com.*",
+        "^about:blank$"
       ],
       "block": [
         "^https?://(?:www\\.)?x\\.com/?$",

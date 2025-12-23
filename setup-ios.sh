@@ -84,7 +84,7 @@ echo ""
 # Check if Podfile exists
 if [ ! -f "Podfile" ]; then
     echo -e "${RED}❌ Podfile not found${NC}"
-    echo "   Run 'npx expo prebuild' first"
+    echo "   Run 'cd apps/mobile/ios && pod install' first"
     exit 1
 fi
 

@@ -1,4 +1,4 @@
-# Creator Mode - Feature Checklist
+# Unscroller - Feature Checklist
 
 ## ✅ Core Features
 

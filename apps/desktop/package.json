@@ -1,8 +1,8 @@
 {
-  "name": "@creator-mode/desktop",
+  "name": "@unscroller/desktop",
   "version": "1.0.0",
-  "description": "Creator Mode Desktop - Distraction-Free Social Browser",
-  "author": "Creator Mode Team",
+  "description": "Unscroller Desktop - Distraction-Free Social Browser",
+  "author": "Unscroller Team",
   "main": "dist/main/index.js",
   "scripts": {
     "clean": "rimraf dist release",
@@ -20,19 +20,34 @@
     "package:all": "npm-run-all package:mac package:win package:linux"
   },
   "build": {
-    "appId": "com.creatormode.desktop",
-    "productName": "Creator Mode",
-    "electronVersion": "28.3.3",
+    "appId": "com.unscroller.desktop",
+    "productName": "Unscroller",
+    "electronVersion": "35.7.5",
     "directories": {
       "output": "release"
     },
-    "artifactName": "Creator Mode-${version}-${os}-${arch}.${ext}",
+    "files": [
+      "dist/**/*",
+      {
+        "from": "../../branding/png",
+        "to": "branding",
+        "filter": [
+          "unscroller-logo-1024.png",
+          "unscroller-logo-512.png",
+          "unscroller-logo-256.png",
+          "unscroller-logo-128.png",
+          "unscroller-logo-64.png"
+        ]
+      }
+    ],
+    "artifactName": "Unscroller-${version}-${os}-${arch}.${ext}",
     "mac": {
       "category": "public.app-category.productivity",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
+      "icon": "build/icons/unscroller.icns",
       "target": [
         {
           "target": "dmg",
@@ -49,25 +64,26 @@
         "nsis",
         "zip"
       ],
-      "icon": "build/icon.ico"
+      "icon": "build/icons/unscroller.ico"
     },
     "linux": {
       "target": [
         "AppImage"
       ],
-      "category": "Network"
+      "category": "Network",
+      "icon": "build/icons/png"
     }
   },
   "dependencies": {
-    "@creator-mode/policy-engine": "*",
     "@supabase/supabase-js": "^2.39.0",
+    "@unscroller/policy-engine": "*",
     "electron-store": "^8.1.0",
     "keytar": "^7.9.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "copy-webpack-plugin": "^13.0.1",
-    "electron": "^28.3.3",
+    "electron": "^35.7.5",
     "electron-builder": "^24.9.0",
     "html-webpack-plugin": "^5.6.0",
     "npm-run-all": "^4.1.5",

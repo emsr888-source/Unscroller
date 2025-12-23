@@ -1,35 +1,49 @@
-import { PolicyParser, PolicyCompiler, Policy } from '@creator-mode/policy-engine';
+import { PolicyParser, PolicyCompiler, Policy } from '@unscroller/policy-engine';
 import Store from 'electron-store';
-import * as https from 'https';
-import * as http from 'http';
+import * as fs from 'fs';
+import * as path from 'path';
+import { app } from 'electron';
 import type { OnBeforeRequestListenerDetails } from 'electron';
-import type { DesktopCompiledRules } from '@creator-mode/policy-engine';
+import type { DesktopCompiledRules } from '@unscroller/policy-engine';
 
 const store = new Store();
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+
+export async function fetchRemotePolicy(url: string) {
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const obj = await res.json();
+    if (!obj || typeof obj !== 'object' || !obj.providers) throw new Error('Invalid policy JSON');
+    return obj;
+  } catch (e) {
+    console.warn('[policy] remote fetch failed:', e);
+    return null;
+  }
+}
 
 export class PolicyManager {
   private cachedPolicy: Policy | null = null;
 
   async fetchPolicy(): Promise<Policy> {
-    try {
-      const response = await this.httpGet(`${BACKEND_URL}/api/policy`);
-      const signedPolicy = JSON.parse(response);
-
-      // Validate and parse
-      const policy = PolicyParser.parse(signedPolicy.policy);
-
-      // Cache
-      store.set('policy', policy);
-      store.set('policy-version', policy.version);
-      this.cachedPolicy = policy;
-
-      console.log(`[PolicyManager] Fetched policy version: ${policy.version}`);
-      return policy;
-    } catch (error) {
-      console.error('[PolicyManager] Failed to fetch policy:', error);
-      return this.getCachedPolicy();
+    const remote = await fetchRemotePolicy(process.env.POLICY_URL ?? 'http://localhost:3001/policy');
+    if (remote) {
+      try {
+        const parsed = PolicyParser.parse(remote as Policy);
+        store.set('policy', parsed);
+        store.set('policy-version', parsed.version);
+        this.cachedPolicy = parsed;
+        console.log(`[PolicyManager] Fetched policy version: ${parsed.version}`);
+        return parsed;
+      } catch (error) {
+        console.error('[PolicyManager] Remote policy parse failed:', error);
+      }
     }
+
+    const localPolicy = this.loadLocalPolicy();
+    if (localPolicy) {
+      return localPolicy;
+    }
+    return this.getCachedPolicy();
   }
 
   getCachedPolicy(): Policy {
@@ -97,15 +111,40 @@ export class PolicyManager {
     return PolicyParser.getProviders(this.getCachedPolicy());
   }
 
-  private httpGet(url: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const protocol = url.startsWith('https:') ? https : http;
-      protocol.get(url, res => {
-        let data = '';
-        res.on('data', chunk => (data += chunk));
-        res.on('end', () => resolve(data));
-        res.on('error', reject);
-      }).on('error', reject);
-    });
+  private loadLocalPolicy(): Policy | null {
+    const appPath = app.getAppPath();
+    const candidatePaths = [
+      path.resolve(appPath, 'policy', 'policy.json'),
+      path.resolve(appPath, 'dist', 'policy', 'policy.json'),
+      path.resolve(appPath, '..', 'policy', 'policy.json'),
+      path.resolve(appPath, '..', '..', 'policy', 'policy.json'),
+      path.resolve(appPath, '..', '..', '..', 'policy', 'policy.json'),
+      path.resolve(__dirname, '..', '..', '..', '..', 'policy', 'policy.json'),
+      path.resolve(process.cwd(), 'policy', 'policy.json'),
+      path.resolve(process.cwd(), '..', 'policy', 'policy.json'),
+      path.resolve(process.cwd(), '..', '..', 'policy', 'policy.json')
+    ];
+
+    for (const candidate of candidatePaths) {
+      try {
+        if (!fs.existsSync(candidate)) {
+          console.log(`[PolicyManager] Local policy not found at ${candidate}`);
+          continue;
+        }
+        console.log(`[PolicyManager] Attempting to load local policy from ${candidate}`);
+        const raw = fs.readFileSync(candidate, 'utf-8');
+        const policy = PolicyParser.parse(JSON.parse(raw));
+        store.set('policy', policy);
+        store.set('policy-version', policy.version);
+        this.cachedPolicy = policy;
+        console.log(`[PolicyManager] Loaded local policy fallback from ${candidate}`);
+        return policy;
+      } catch (error) {
+        console.error('[PolicyManager] Failed reading local policy candidate:', candidate, error);
+      }
+    }
+
+    return null;
   }
+
 }

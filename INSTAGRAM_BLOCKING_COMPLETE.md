@@ -171,7 +171,7 @@
 ## 🚀 **What Happens Now**
 
 ### **Mobile App Behavior:**
-1. User opens Instagram in Creator Mode
+1. User opens Instagram in Unscroller
 2. App loads enhanced policy (56 block patterns)
 3. Navigation to home page → **BLOCKED** 🔒
 4. Navigation to explore → **BLOCKED** 🔒
@@ -218,7 +218,7 @@
 - ✅ **Feed content:** Completely blocked
 - ✅ **DMs & Posting:** Still allowed ✅
 
-**Users can now use Instagram in Creator Mode without any access to distracting algorithmic content!**
+**Users can now use Instagram in Unscroller without any access to distracting algorithmic content!**
 
 ---
 

@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0",
+  "version": "1.9.7",
   "youtubeFilterMode": "safe",
   "providers": {
     "instagram": {
@@ -172,7 +172,8 @@
         "^/compose/tweet/?$",
         "^/settings/profile/?$",
         "^/notifications(?:/mentions)?/?$",
-        "^/[A-Za-z0-9_]{1,15}(?:/(with_replies|media|likes))?/?$"
+        "^/[A-Za-z0-9_]{1,15}(?:/(with_replies|media|likes))?/?$",
+        "^about:blank$"
       ],
       "block": [
         "^/?$",

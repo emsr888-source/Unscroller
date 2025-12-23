@@ -34,6 +34,14 @@ module.exports = {
           from: 'src/renderer/domScript.js',
           to: 'domScript.js',
         },
+        {
+          from: '../../branding/png/unscroller-logo-512.png',
+          to: 'icon.png',
+        },
+        {
+          from: '../../branding/png/unscroller-logo-64.png',
+          to: 'favicon.png',
+        },
       ],
     }),
   ],

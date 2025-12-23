@@ -1,5 +1,5 @@
-{
-  "version": "1.9.0",
+  {
+ "version": "1.9.7",
   "youtubeFilterMode": "safe",
   "providers": {
     "instagram": {
@@ -63,11 +63,22 @@
         "*://edge-chat.instagram.com/*",
         "*://gateway.instagram.com/*",
         "wss://edge-chat.instagram.com/*",
-        "wss://gateway.instagram.com/*"
+        "wss://gateway.instagram.com/*",
+        "^/(?!((?:explore|search|reels?|p|tv|stories|foryou|following|feed|timeline|suggested(?:_users)?|tags|locations|ads|video|videos|login|accounts|settings|your_activity|notifications|direct|create|professional_dashboard|insights|api|graphql|ajax|static|rsrc|business|connect|edge-chat|gateway|privacy|security|support|help|about|press|developers|jobs|careers|policies|terms|accounts_center))(?:/|$))[A-Za-z0-9_.]{1,30}/?(?:\\?.*)?",
+        "^/(?!((?:explore|search|reels?|p|tv|stories|foryou|following|feed|timeline|suggested(?:_users)?|tags|locations|ads|video|videos|login|accounts|settings|your_activity|notifications|direct|create|professional_dashboard|insights|api|graphql|ajax|static|rsrc|business|connect|edge-chat|gateway|privacy|security|support|help|about|press|developers|jobs|careers|policies|terms|accounts_center))(?:/|$))[A-Za-z0-9_.]{1,30}/(saved|tagged|channel|grid|highlights|guides|posts|media|videos)/?(?:\\?.*)?",
+        "*://instagram.com/*/grid/*",
+        "*://www.instagram.com/*/grid/*",
+        "*://instagram.com/*/highlights/*",
+        "*://www.instagram.com/*/highlights/*",
+        "^/[A-Za-z0-9_.]+/?(?:\\?.*)?$",
+        "^/[A-Za-z0-9_.]+/saved/?(?:\\?.*)?$",
+        "^/[A-Za-z0-9_.]+/tagged/?(?:\\?.*)?$",
+        "^/[A-Za-z0-9_.]+/channel/?(?:\\?.*)?$",
+        "^/[A-Za-z0-9_.]+/grid/?(?:\\?.*)?$",
+        "^/[A-Za-z0-9_.]+/highlights/?(?:\\?.*)?$",
+        "^/[A-Za-z0-9_.]+/.+$"
       ],
       "block": [
-        "*://instagram.com/?*",
-        "*://www.instagram.com/?*",
         "/explore",
         "/explore/",
         "/explore/.*",
@@ -141,21 +152,7 @@
           "[data-testid='explore-grid']",
           "[data-testid='search-container']"
         ],
-        "disableAnchorsTo": [
-          "/",
-          "/explore",
-          "/explore/",
-          "/search",
-          "/search/",
-          "/tv",
-          "/tv/",
-          "/stories",
-          "/stories/",
-          "/foryou",
-          "/foryou/",
-          "/following",
-          "/following/"
-        ],
+        "disableAnchorsTo": [],
         "script": "if (window.location.pathname === '/' || window.location.pathname === '') { window.location.href = '/direct/inbox/'; }"
       },
       "quick": {
@@ -168,27 +165,32 @@
     "x": {
       "start": "https://x.com/messages",
       "allow": [
-        "^/messages/?$",
-        "^/compose/tweet/?$",
-        "^/settings/profile/?$",
-        "^/notifications(?:/mentions)?/?$",
-        "^/[A-Za-z0-9_]{1,15}(?:/(with_replies|media|likes))?/?$"
+        "^/messages/?(?:\\?.*)?$",
+        "^/compose/tweet/?(?:\\?.*)?$",
+        "^/settings/.*$",
+        "^/notifications(?:/mentions)?/?(?:\\?.*)?$",
+        "^/i/flow/.*$",
+        "^/account/.*$",
+        "^/login/?(?:\\?.*)?$",
+        "^/signup/?(?:\\?.*)?$",
+        "^/[A-Za-z0-9_]{1,15}(?:/(with_replies|media|likes))?/?(?:\\?.*)?$",
+        "^about:blank$"
       ],
       "block": [
-        "^/?$",
-        "^/home/?$",
         "^/explore/?$",
-        "^/i/spaces(?:/.*)?$"
+        "^/communities(?:/.*)?$",
+        "^/i/communities(?:/.*)?$",
+        "^/lists(?:/.*)?$"
       ],
       "dom": {
         "hide": [
           "a[href='/home']",
-          "a[href='/explore']"
+          "a[href='/explore']",
+          "a[href='/communities']",
+          "a[href='/lists']"
         ],
-        "disableAnchorsTo": [
-          "/home",
-          "/explore"
-        ]
+        "disableAnchorsTo": [],
+        "script": "(function(){try{var path=(location.pathname||'').replace(/\\/$/, '');var hasSession=document.cookie.indexOf('auth_token=')!==-1;var blocked=['','/home','/explore','/communities','/lists'];if(hasSession&&blocked.indexOf(path)>=0){location.replace('/messages');}}catch(e){console.warn('[Unscroller][x] redirect guard failed',e);}})();"
       },
       "quick": {
         "dm": "https://x.com/messages",
@@ -208,13 +210,15 @@
       ],
       "block": [
         "^/?$",
-        "^/shorts/.*$"
+        "^/shorts/.*$",
+        "^/feed/subscriptions(?:/.*)?$"
       ],
       "dom": {
         "hide": [
           "a[title='Shorts']",
           "a[title*='Shorts']",
           "a[href*='/shorts']",
+          "a[href='/feed/subscriptions']",
           "ytd-reel-shelf-renderer",
           "ytd-rich-shelf-renderer:has([title*='Shorts'])",
           "#shorts-container",
@@ -223,15 +227,18 @@
           "[title*='#shorts']",
           "[aria-label*='Shorts']",
           "ytd-guide-entry-renderer:has([title='Shorts'])",
+          "ytd-mini-guide-entry-renderer[aria-label='Shorts']",
+          "ytd-mini-guide-entry-renderer:has([title='Shorts'])",
           "ytm-pivot-bar-item-renderer:has([aria-label*='Shorts'])",
+          "ytd-guide-entry-renderer:has(a[href='/feed/subscriptions'])",
+          "ytd-mini-guide-entry-renderer:has(a[href='/feed/subscriptions'])",
+          "ytm-guide-entry-renderer:has(a[href='/feed/subscriptions'])",
+          "yt-chip-cloud-chip-renderer:has(a[href^='/shorts'])",
           ".shorts-shelf",
           "[id*='shorts']"
         ],
-        "script": "window.__CM_blockShorts=true;",
-        "disableAnchorsTo": [
-          "/shorts",
-          "/shorts/"
-        ]
+        "script": "(function(){try{if(window.__cm_yt_guard){return;}window.__cm_yt_guard=true;var fallback='/feed/you';var policyStart=(window.__CM_POLICY&&window.__CM_POLICY.start)||'';if(policyStart&&policyStart.indexOf('http')===0){try{var parsed=new URL(policyStart);fallback=parsed.pathname||fallback;}catch(_err){}}function redirectIfBlocked(){var path=(location.pathname||'').toLowerCase();if(path==='/feed/subscriptions'||path==='/feed/subscriptions/'){var target=fallback;try{if(target&&target.charAt(0)==='/'){target=location.origin+target;}}catch(_e){}if(target&&location.href!==target){location.replace(target);}}}function removeSubscriptionLinks(){var selectors=['a[href=\\'/feed/subscriptions\\']','ytd-guide-entry-renderer:has(a[href=\\'/feed/subscriptions\\'])','ytd-mini-guide-entry-renderer:has(a[href=\\'/feed/subscriptions\\'])','ytm-guide-entry-renderer:has(a[href=\\'/feed/subscriptions\\'])','yt-chip-cloud-chip-renderer:has(a[href=\\'/feed/subscriptions\\'])','ytd-guide-entry-renderer [title=\\'Subscriptions\\']','ytd-mini-guide-entry-renderer [title=\\'Subscriptions\\']'];try{document.querySelectorAll(selectors.join(',')).forEach(function(node){if(node&&node.remove){node.remove();}});}catch(_err){}}function bootstrap(){redirectIfBlocked();removeSubscriptionLinks();}bootstrap();var observer=new MutationObserver(function(){redirectIfBlocked();removeSubscriptionLinks();});observer.observe(document.documentElement,{childList:true,subtree:true});window.addEventListener('popstate',redirectIfBlocked,true);window.addEventListener('yt-page-data-fetched',redirectIfBlocked,true);}catch(_mainError){console.warn('[Unscroller][yt] policy script failed',_mainError);}})();",
+        "disableAnchorsTo": []
       },
       "filterModes": {
         "safe": {
@@ -248,7 +255,11 @@
             "ytd-ad-slot-renderer",
             "ytd-action-companion-ad-renderer",
             "#masthead-ad",
-            "ytd-engagement-panel-section-list-renderer[visibility='ENGAGEMENT_PANEL_VISIBILITY_EXPANDED']"
+            "ytd-engagement-panel-section-list-renderer[visibility='ENGAGEMENT_PANEL_VISIBILITY_EXPANDED']",
+            "ytd-mini-guide-entry-renderer[aria-label='Shorts']",
+            "ytd-guide-entry-renderer:has([title='Shorts'])",
+            "ytd-guide-entry-renderer:has(a[href='/feed/subscriptions'])",
+            "ytd-mini-guide-entry-renderer:has(a[href='/feed/subscriptions'])"
           ]
         }
       },
@@ -259,113 +270,171 @@
       }
     },
     "tiktok": {
-      "start": "https://www.tiktok.com/upload",
+      "start": "https://www.tiktok.com/messages",
       "allow": [
-        "*://tiktok.com/upload*",
-        "*://www.tiktok.com/upload*",
-        "*://tiktok.com/creator-center*",
-        "*://www.tiktok.com/creator-center*",
-        "*://tiktok.com/login*",
-        "*://www.tiktok.com/login*",
-        "*://tiktok.com/signup*",
-        "*://www.tiktok.com/signup*",
-        "*://tiktok.com/passport/web/login*",
-        "*://www.tiktok.com/passport/web/login*",
-        "*://tiktok.com/passport/web/register*",
-        "*://www.tiktok.com/passport/web/register*",
-        "*://tiktok.com/login*",
-        "*://www.tiktok.com/login*",
-        "*://libraweb-sg.tiktok.com/*",
-        "*://mssdk-sg.tiktok.com/*",
-        "*://tiktok.com/@*",
-        "*://www.tiktok.com/@*",
-        "*://tiktok.com/settings*",
-        "*://www.tiktok.com/settings*",
-        "*://tiktok.com/api/*",
-        "*://www.tiktok.com/api/*",
-        "*://tiktok.com/passport/*",
-        "*://www.tiktok.com/passport/*",
-        "*://tiktok.com/ttwid/*",
-        "*://www.tiktok.com/ttwid/*",
-        "*://*.tiktokcdn.com/*",
-        "*://*.ttwstatic.com/*"
+        "^/login(?:/.*)?$",
+        "^/upload/?$",
+        "^/upload/.*$",
+        "^/messages(?:/.*)?$",
+        "^/@[A-Za-z0-9_.-]+/?$",
+        "^/@[A-Za-z0-9_.-]+/video/.*$",
+        "^/settings.*$",
+        "^/studio/?$",
+        "^/studio/.*$",
+        "^/creator/?$",
+        "^/creator/.*$",
+        "^/business-suite/?$",
+        "^/business-suite/.*$",
+        "^/t/[A-Za-z0-9_.-]+/?$",
+        "^/video/.*$",
+        "^/tag/.*$"
       ],
       "block": [
-        "^https?://(?:www\\.)?tiktok\\.com/?$",
-        "^https?://(?:www\\.)?tiktok\\.com/\\?.*$",
-        "^https?://tiktok\\.com/?$",
-        "^https?://tiktok\\.com/\\?.*$",
-        "/foryou",
-        "/foryou/.*",
-        "/following",
-        "/following/.*",
-        "/@[^/]+/video/.*",
-        "/discover",
-        "/discover/.*",
-        "/search",
-        "/search/.*",
-        "/tag/.*",
-        "/music/.*",
-        "/trending",
-        "/trending/.*",
-        "/live"
+        "^/$",
+        "^/foryou",
+        "^/following",
+        "^/friends",
+        "^/live",
+        "^/discover",
+        "^/explore",
+        "^/search",
+        "^/feed"
       ],
       "dom": {
         "hide": [
+          "aside *",
+          "nav *", 
+          "div[class*='sidebar'] *",
+          "div[class*='Sidebar'] *",
+          "div[class*='left'] *",
+          "div[class*='Left'] *",
+          "div[class*='side'] *",
+          "div[class*='Side'] *",
+          "button[class*='back']",
+          "button[aria-label*='Back']",
+          "button[title*='Back']",
+          "div[class*='back']",
+          "div[aria-label*='Back']",
+          "div[title*='Back']",
+          "a[class*='back']",
+          "a[aria-label*='Back']",
+          "a[title*='Back']",
+          "[data-e2e*='back']",
+          "[data-e2e*='Back']",
+          "svg[class*='back']",
+          "div[id*='back']",
+          "div[id*='Back']",
+          "aside",
+          "nav",
+          "div[class*='sidebar']",
+          "div[class*='Sidebar']",
+          "div[class*='left']",
+          "div[class*='Left']",
+          "div[class*='side']",
+          "div[class*='Side']",
+          "div[class*='DivContainer']",
+          "div[class*='DivLeft']",
+          "div[class*='DivSidebar']",
+          "div[class*='DivNav']",
+          "div[class*='DivMenu']",
+          "div[class*='-DivItemContainer']",
+          "div[class*='-DivLeftNav']",
+          "div[class*='-DivSideNav']",
+          "div[class*='-DivNavigation']",
+          "a[class*='-Item']",
+          "a[class*='-Nav']",
+          "a[class*='-Menu']",
+          "a[class*='-Link']",
+          "li[class*='-Item']",
+          "li[class*='-Nav']",
+          "li[class*='-Menu']",
+          "span[class*='-Text']",
+          "span[class*='-Label']",
+          "[data-e2e*='nav']",
+          "[data-e2e*='menu']",
+          "[data-e2e*='sidebar']",
+          "[data-e2e*='left']",
+          "[data-e2e*='item']",
+          "button[class*='nav']",
+          "button[class*='menu']",
+          "[class*='navigation']",
+          "[class*='Navigation']",
+          "[id*='nav']",
+          "[id*='menu']",
+          "[id*='sidebar']",
+          "[id*='navigation']",
+          "a[href='/']",
           "a[href='/foryou']",
-          "a[href='/discover']",
           "a[href='/following']",
-          "a[href*='/video/']",
-          "[data-e2e='nav-foryou']",
-          "[data-e2e='nav-following']",
-          "[aria-label*='For You']",
-          "[aria-label*='Following']"
+          "a[href='/friends']",
+          "a[href='/live']",
+          "a[href='/discover']",
+          "a[href='/explore']",
+          "a[href='/search']",
+          "a[href='/feed']"
         ],
-        "disableAnchorsTo": [
-          "/foryou",
-          "/discover",
-          "/following",
-          "/search",
-          "/tag/"
-        ]
-      },
-      "quick": {
-        "dm": "https://www.tiktok.com/messages",
-        "compose": "https://www.tiktok.com/upload",
-        "profile": "https://www.tiktok.com/@username",
-        "notifications": "https://www.tiktok.com/notifications"
+        "script": "(function(){const BLOCKED=['/','/foryou','/following','/friends','/live','/discover','/explore','/search','/feed'];function hideSidebarAndBack(){const sidebarSelectors=['aside','nav','div[class*=\"sidebar\"]','div[class*=\"Sidebar\"]','div[class*=\"left\"]','div[class*=\"Left\"]','div[class*=\"side\"]','div[class*=\"Side\"]'];const backSelectors=['button[class*=\"back\"]','button[aria-label*=\"Back\"]','button[title*=\"Back\"]','div[class*=\"back\"]','div[aria-label*=\"Back\"]','div[title*=\"Back\"]','a[class*=\"back\"]','a[aria-label*=\"Back\"]','a[title*=\"Back\"]','[data-e2e*=\"back\"]','[data-e2e*=\"Back\"]','svg[class*=\"back\"]','div[id*=\"back\"]','div[id*=\"Back\"]'];[...sidebarSelectors,...backSelectors].forEach(sel=>{document.querySelectorAll(sel).forEach(el=>{el.style.display='none!important';el.style.visibility='hidden!important';el.style.pointerEvents='none!important';});});}function disableSidebarClicks(){const sidebarContainers=document.querySelectorAll('aside,nav,div[class*=\"sidebar\"],div[class*=\"Sidebar\"],div[class*=\"left\"],div[class*=\"Left\"]');sidebarContainers.forEach(container=>{container.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();return false;},true);container.addEventListener('mousedown',function(e){e.preventDefault();e.stopPropagation();return false;},true);container.addEventListener('touchstart',function(e){e.preventDefault();e.stopPropagation();return false;},true);});}function preventBackNavigation(){history.pushState(null,null,location.href);window.onpopstate=function(){if(BLOCKED.includes(window.location.pathname)){window.location.href='/messages';}else{history.pushState(null,null,location.href);}};}function redirectIfNeeded(){if(BLOCKED.includes(window.location.pathname)){window.location.replace('/messages');}}hideSidebarAndBack();disableSidebarClicks();preventBackNavigation();redirectIfNeeded();setInterval(function(){hideSidebarAndBack();disableSidebarClicks();redirectIfNeeded();},1000);})();",
+        "disableAnchorsTo": []
       }
     },
     "facebook": {
       "start": "https://m.facebook.com/me",
       "allow": [
-        "^/me/?$",
-        "^/profile\\.php.*$",
+        "^/me/?(?:\\?.*)?$",
+        "^/profile\\.php(?:\\?.*)?$",
         "^/pages/.*$",
         "^/composer/.*$",
         "^/messages/t/.*$",
-        "^/notifications.*$",
-        "^/settings.*$"
+        "^/notifications(?:/.*)?(?:\\?.*)?$",
+        "^/settings(?:/.*)?(?:\\?.*)?$",
+        "^/business(?:/.*)?(?:\\?.*)?$"
       ],
       "block": [
-        "^/?$",
-        "^/home\\.php$",
-        "^/\\?$",
-        "^/\\?sk=.*$",
-        "^/watch(?:/.*)?$",
-        "^/videos?(?:/.*)?$",
-        "^/reel(?:s)?(?:/.*)?$",
-        "^/stories(?:/.*)?$",
-        "^/search(?:/.*)?$"
+        "^/$",
+        "^/home\\.php(?:\\?.*)?$",
+        "^/\\?(?:sk=.*|ref.*|refid.*)$",
+        "^/watch(?:/.*)?(?:\\?.*)?$",
+        "^/videos?(?:/.*)?(?:\\?.*)?$",
+        "^/reel(?:s)?(?:/.*)?(?:\\?.*)?$",
+        "^/stories(?:/.*)?(?:\\?.*)?$",
+        "^/search(?:/.*)?(?:\\?.*)?$",
+        "^/gaming(?:/.*)?(?:\\?.*)?$",
+        "^/games?(?:/.*)?(?:\\?.*)?$",
+        "^/feeds?(?:/.*)?(?:\\?.*)?$",
+        "^/marketplace(?:/.*)?(?:\\?.*)?$",
+        "^/groups?(?:/.*)?(?:\\?.*)?$",
+        "^/friends(?:/.*)?(?:\\?.*)?$",
+        "^/events?(?:/.*)?(?:\\?.*)?$"
       ],
       "dom": {
         "hide": [
-          "[role='feed']",
-          "a[href*='/watch']",
+          "a[aria-label='Home']",
+          "a[href^='/watch']",
+          "a[aria-label='Watch']",
           "a[href*='/videos']",
+          "a[aria-label='Video']",
           "a[href*='/reel']",
-          "a[href*='/stories']",
-          "a[href^='/search']"
+          "a[aria-label='Reels']",
+          "a[href^='/?sk=']",
+          "a[href^='/feeds']",
+          "a[href^='/gaming']",
+          "a[href^='/games']",
+          "a[href^='/marketplace']",
+          "a[href^='/groups']",
+          "a[href^='/friends']",
+          "a[aria-label='Marketplace']",
+          "a[aria-label='Groups']",
+          "a[aria-label='Friends']",
+          "[role='menu'] a[href*='/watch']",
+          "[role='menu'] a[href*='/videos']",
+          "[role='menu'] a[href*='/reel']",
+          "[role='menu'] a[href^='/feeds']",
+          "[role='menu'] a[href^='/gaming']",
+          "[role='menu'] a[href^='/games']",
+          "[role='menu'] a[href^='/marketplace']",
+          "[role='menu'] a[href^='/groups']",
+          "[role='menu'] a[href^='/friends']",
+          "[role='feed']"
         ],
         "disableAnchorsTo": [
           "/home.php",
@@ -373,8 +442,17 @@
           "/videos",
           "/reel",
           "/stories",
-          "/search"
-        ]
+          "/search",
+          "/gaming",
+          "/games",
+          "/feeds",
+          "/marketplace",
+          "/groups",
+          "/friends",
+          "/events",
+          "/?sk="
+        ],
+        "script": "(function(){try{if(window.__cm_facebook_guard){return;}window.__cm_facebook_guard=true;var START_URL='https://m.facebook.com/me';var START_PATH='/me';try{var parsed=new URL(START_URL);START_PATH=parsed.pathname||START_PATH;}catch(_e){}var BLOCKED=['/','/home.php','/watch','/watch/feed','/watch/live','/watch/saved','/videos','/reels','/stories','/gaming','/games','/feeds','/?sk=','/marketplace','/groups','/friends','/events'];var NAV_TEXT=['home','video','videos','watch','reels'];var OPEN_APP_TEXT=['open app','open facebook','use app','download app','open in app'];var SELECTORS=['[data-testid=\\'open-in-app-banner\\']','[data-testid=\\'open_app_banner\\']','a[href^=\\'fb://\\']','a[href*=\\'open_app\\']','a[href*=\\'app_install\\']','div[data-sigil*=\\'open-app\\']','div[data-testid*=\\'app_banner\\']','div[role=\\'presentation\\'] a[href^=\\'fb://\\']','div[role=\\'button\\'][data-lynx-mode=\\'asynclazy\\']'];var NAV_SELECTORS=[['[role=\\'navigation\\'] a[href=\\'/\\']'],['a[aria-label=\\'Home\\']'],['a[aria-label=\\'Watch\\']'],['a[href*=\\'/videos\\']'],['a[href*=\\'/reel\\']'],['a[href^=\\'/?sk=\\']'],['a[href^=\\'/feeds\\']'],['a[href^=\\'/gaming\\']'],['a[href^=\\'/games\\']'],['a[href^=\\'/marketplace\\']'],['a[href^=\\'/groups\\']'],['a[href^=\\'/friends\\']'],['[role=\\'menu\\'] a[href*=\\'/watch\\']'],['[role=\\'menu\\'] a[href*=\\'/videos\\']'],['[role=\\'menu\\'] a[href*=\\'/reel\\']'],['[role=\\'menu\\'] a[href^=\\'/feeds\\']'],['[role=\\'menu\\'] a[href^=\\'/gaming\\']'],['[role=\\'menu\\'] a[href^=\\'/games\\']'],['[role=\\'menu\\'] a[href^=\\'/marketplace\\']'],['[role=\\'menu\\'] a[href^=\\'/groups\\']'],['[role=\\'menu\\'] a[href^=\\'/friends\\']'],['[role=\\'feed\\']']];function normalize(input){if(!input){return '';}try{return new URL(input,location.origin).pathname.toLowerCase();}catch(_err){try{var a=document.createElement('a');a.href=input;return (a.pathname||'').toLowerCase();}catch(_ignored){return (String(input).split('?')[0]||'').toLowerCase();}}}function isBlockedPath(path){var normalized=normalize(path);if(!normalized){return false;}if(normalized===START_PATH||normalized.indexOf(START_PATH+'/')===0){return false;}for(var i=0;i<BLOCKED.length;i++){var candidate=BLOCKED[i];if(!candidate){continue;}if(candidate==='/'){if(normalized==='/'||normalized===''){return true;}}else if(normalized===candidate||normalized.indexOf(candidate+'/')===0){return true;}}return false;}function hideNode(node){if(!node||node.__cmHidden){return;}node.__cmHidden=true;try{node.style.display='none';node.style.visibility='hidden';node.style.pointerEvents='none';node.setAttribute('aria-hidden','true');}catch(_err){}}function matchesText(node,patterns){if(!node||!patterns||!patterns.length){return false;}var text='';try{text=(node.innerText||node.textContent||'').toLowerCase();}catch(_e){text='';}if(!text){return false;}for(var i=0;i<patterns.length;i++){if(text.indexOf(patterns[i])!==-1){return true;}}return false;}function hideOpenAppElements(){SELECTORS.forEach(function(selector){try{document.querySelectorAll(selector).forEach(hideNode);}catch(_err){}});try{document.querySelectorAll('a,button,div[role=\\'button\\'],span').forEach(function(node){if(matchesText(node,OPEN_APP_TEXT)){hideNode(node);}});}catch(_error){}}function purgeNav(){NAV_SELECTORS.forEach(function(group){try{document.querySelectorAll(group.join(',')).forEach(hideNode);}catch(_err){}});try{document.querySelectorAll('a,button,div[role=\\'button\\']').forEach(function(node){if(matchesText(node,NAV_TEXT)){hideNode(node);}});}catch(_er){}}function enforceRoute(){if(isBlockedPath(location.pathname+location.search)){location.replace(START_URL);}}document.addEventListener('click',function(event){var anchor=event.target&&event.target.closest?event.target.closest('a[href]'):null;if(!anchor){return;}var href=anchor.getAttribute('href')||'';if(href[0]==='#'){return;}if(href.indexOf('http')!==0&&href.indexOf('/')!==0){return;}if(isBlockedPath(href)){event.preventDefault();event.stopPropagation();enforceRoute();}},true);var originalPushState=history.pushState;var originalReplaceState=history.replaceState;function wrap(fn){return function(){try{return fn.apply(this,arguments);}finally{setTimeout(function(){enforceRoute();hideOpenAppElements();purgeNav();},120);}};}if(typeof originalPushState==='function'){history.pushState=wrap(originalPushState);}if(typeof originalReplaceState==='function'){history.replaceState=wrap(originalReplaceState);}window.addEventListener('popstate',function(){setTimeout(function(){enforceRoute();hideOpenAppElements();purgeNav();},120);},true);enforceRoute();hideOpenAppElements();purgeNav();var observer=new MutationObserver(function(){hideOpenAppElements();purgeNav();});observer.observe(document.documentElement,{childList:true,subtree:true});}catch(error){console.warn('[Unscroller][fb] policy script failed',error);}})();"
       },
       "quick": {
         "dm": "https://m.facebook.com/messages/",

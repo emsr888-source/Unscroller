@@ -62,19 +62,50 @@ export class AndroidCompiler {
     },
     
     disableAnchors() {
-      this.disabledAnchors.forEach(path => {
+      const toSelector = (value: unknown): string | null => {
+        if (typeof value !== 'string') {
+          return null;
+        }
+
+        const trimmed = value.trim();
+        if (!trimmed) {
+          return null;
+        }
+
+        if (trimmed === '/' || trimmed === '#') {
+          return "a[href='" + trimmed + "']";
+        }
+
+        if (trimmed.endsWith('*')) {
+          const base = trimmed.slice(0, -1).trim();
+          return base ? "a[href^='" + base + "']" : null;
+        }
+
+        return "a[href^='" + trimmed + "']";
+      };
+
+      this.disabledAnchors.forEach(entry => {
         try {
-          document.querySelectorAll(\`a[href^="\${path}"]\`).forEach(el => {
-            el.addEventListener('click', e => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (window.CreatorMode) {
-                window.CreatorMode.onBlockedNavigation(path);
-              }
-            }, true);
+          const selector = toSelector(entry);
+          if (!selector) {
+            return;
+          }
+
+          document.querySelectorAll(selector).forEach(el => {
+            el.addEventListener(
+              'click',
+              e => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (window.Unscroller) {
+                  window.Unscroller.onBlockedNavigation(String(entry));
+                }
+              },
+              true
+            );
           });
         } catch (e) {
-          console.warn('[CM] Failed to disable anchors:', path, e);
+          console.warn('[CM] Failed to disable anchors:', entry, e);
         }
       });
     },

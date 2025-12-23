@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# AI-Powered Policy Update Script for Creator Mode
+# AI-Powered Policy Update Script for Unscroller
 # This script demonstrates how the AI system can automatically update policies
 
-echo "🤖 Creator Mode AI Policy Update System"
+echo "🤖 Unscroller AI Policy Update System"
 echo "======================================"
 
 # Check if backend is running
@@ -82,7 +82,7 @@ echo "   3. Policy Updates: Generates recommendations automatically"
 echo "   4. Auto-Updates: Applies changes with version control"
 
 echo ""
-echo "🚀 Your AI-powered Creator Mode is ready!"
+echo "🚀 Your AI-powered Unscroller is ready!"
 echo "   The system will now automatically:"
 echo "   • Monitor platform changes"
 echo "   • Discover new distracting content"

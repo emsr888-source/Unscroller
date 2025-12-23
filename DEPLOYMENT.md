@@ -48,7 +48,7 @@ Deploy to your provider:
    ```bash
    cd apps/mobile/ios
    pod install
-   open CreatorMode.xcworkspace
+   open Unscroller.xcworkspace
    ```
 
 2. **Set up signing & capabilities**

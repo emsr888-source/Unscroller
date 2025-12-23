@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "ios": {
+      "bundleIdentifier": "com.onalime.unscroller",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1d17dd60-4773-44e3-849c-80ab99b4be3e"
+      },
+      "devBypassUserId": "dev_user_maya"
+    },
+    "android": {
+      "package": "com.onalime.unscroller"
+    }
+  }
+}

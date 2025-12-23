@@ -1,13 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subscription } from './entities/subscription.entity';
 import { Entitlement } from './entities/entitlement.entity';
 import Stripe from 'stripe';
+import { Auth, google } from 'googleapis';
+
+type ReceiptPlatform = 'ios' | 'android';
+
+type PurchasePayload = {
+  productId: string;
+  orderId?: string;
+  purchaseToken?: string;
+  transactionId?: string;
+  purchaseState?: number;
+  purchaseTime?: number;
+  quantity?: number;
+  acknowledged?: boolean;
+  receipt?: string | null;
+  transactionReceipt?: string | null;
+};
+
+type VerifyReceiptRequest = {
+  userId: string;
+  platform: ReceiptPlatform;
+  purchase: PurchasePayload;
+};
+
+type VerificationResult = {
+  expiresAt: Date;
+  externalId?: string;
+  status: 'active' | 'expired' | 'cancelled';
+};
+
+const DEFAULT_SUBSCRIPTION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class SubscriptionService {
   private stripe: Stripe;
+  private googleAuth?: Auth.GoogleAuth;
 
   constructor(
     @InjectRepository(Subscription)
@@ -20,35 +51,149 @@ export class SubscriptionService {
     });
   }
 
-  async verifyIOSReceipt(userId: string, receiptData: any): Promise<Subscription> {
-    // In production, verify with Apple's servers
-    // For now, create a mock subscription
-    const subscription = this.subscriptionRepository.create({
+  async verifyReceipt({ userId, platform, purchase }: VerifyReceiptRequest): Promise<Subscription> {
+    if (!purchase?.productId) {
+      throw new BadRequestException('Purchase payload missing productId');
+    }
+
+    let verification: VerificationResult | null = null;
+
+    if (platform === 'ios') {
+      verification = await this.verifyIOSReceipt(purchase);
+    } else if (platform === 'android') {
+      verification = await this.verifyAndroidReceipt(purchase);
+    }
+
+    if (!verification) {
+      throw new BadRequestException('Invalid platform');
+    }
+
+    const subscription = await this.upsertSubscription({
       userId,
-      platform: 'ios',
-      status: 'active',
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      platform,
+      externalId: verification.externalId ?? purchase.transactionId ?? purchase.orderId ?? purchase.purchaseToken ?? purchase.productId,
+      expiresAt: verification.expiresAt,
+      status: verification.status,
     });
 
-    await this.subscriptionRepository.save(subscription);
-    await this.updateEntitlements(userId);
+    await this.updateEntitlements(userId, verification.expiresAt, verification.status);
 
     return subscription;
   }
 
-  async verifyAndroidReceipt(userId: string, receiptData: any): Promise<Subscription> {
-    // In production, verify with Google Play
-    const subscription = this.subscriptionRepository.create({
-      userId,
-      platform: 'android',
-      status: 'active',
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  private async verifyIOSReceipt(purchase: PurchasePayload): Promise<VerificationResult> {
+    const receiptData = purchase.receipt || purchase.transactionReceipt;
+    const sharedSecret = process.env.APPLE_SHARED_SECRET;
+
+    if (!receiptData || !sharedSecret) {
+      if (!sharedSecret) {
+        console.warn('[Subscription] APPLE_SHARED_SECRET not set; skipping Apple receipt validation.');
+      }
+      return {
+        expiresAt: new Date(Date.now() + DEFAULT_SUBSCRIPTION_DURATION_MS),
+        externalId: purchase.transactionId ?? purchase.orderId,
+        status: 'active',
+      };
+    }
+
+    const verifyAgainst = async (url: string) => {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          'receipt-data': receiptData,
+          password: sharedSecret,
+          'exclude-old-transactions': true,
+        }),
+      });
+      return response.json() as Promise<any>;
+    };
+
+    let result = await verifyAgainst('https://buy.itunes.apple.com/verifyReceipt');
+    if (result?.status === 21007) {
+      result = await verifyAgainst('https://sandbox.itunes.apple.com/verifyReceipt');
+    }
+
+    if (!result || result.status !== 0) {
+      throw new Error(`Apple receipt validation failed (status ${result?.status ?? 'unknown'})`);
+    }
+
+    const items: any[] = result.latest_receipt_info || result.receipt?.in_app || [];
+    const relevant = purchase.productId ? items.filter(item => item.product_id === purchase.productId) : items;
+    const latest = relevant.sort((a, b) => Number(a.expires_date_ms || 0) - Number(b.expires_date_ms || 0)).pop();
+
+    const expiresMs = Number(latest?.expires_date_ms ?? latest?.expires_date) || Date.now() + DEFAULT_SUBSCRIPTION_DURATION_MS;
+    const status: 'active' | 'expired' = expiresMs > Date.now() ? 'active' : 'expired';
+
+    return {
+      expiresAt: new Date(expiresMs),
+      externalId: latest?.original_transaction_id ?? latest?.transaction_id ?? purchase.transactionId ?? purchase.orderId,
+      status,
+    };
+  }
+
+  private getGoogleCredentials(): Auth.Credentials | undefined {
+    const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.GOOGLE_SERVICE_ACCOUNT;
+    if (!raw) {
+      return undefined;
+    }
+
+    try {
+      const json = raw.trim().startsWith('{') ? raw : Buffer.from(raw, 'base64').toString('utf-8');
+      return JSON.parse(json);
+    } catch (error) {
+      console.warn('[Subscription] Failed to parse Google service account JSON');
+      return undefined;
+    }
+  }
+
+  private buildGoogleAuth(): Auth.GoogleAuth {
+    return new google.auth.GoogleAuth({
+      credentials: this.getGoogleCredentials(),
+      scopes: ['https://www.googleapis.com/auth/androidpublisher'],
     });
+  }
 
-    await this.subscriptionRepository.save(subscription);
-    await this.updateEntitlements(userId);
+  private async verifyAndroidReceipt(purchase: PurchasePayload): Promise<VerificationResult> {
+    const packageName = process.env.ANDROID_PACKAGE_NAME;
+    if (!purchase.purchaseToken || !packageName) {
+      if (!purchase.purchaseToken) {
+        console.warn('[Subscription] Missing purchaseToken; granting temporary entitlement without Google validation.');
+      }
+      if (!packageName) {
+        console.warn('[Subscription] ANDROID_PACKAGE_NAME not set; skipping Google Play validation.');
+      }
+      return {
+        expiresAt: new Date(Date.now() + DEFAULT_SUBSCRIPTION_DURATION_MS),
+        externalId: purchase.orderId ?? purchase.purchaseToken ?? purchase.transactionId ?? purchase.productId,
+        status: 'active',
+      };
+    }
 
-    return subscription;
+    try {
+      const auth = this.googleAuth ?? this.buildGoogleAuth();
+      this.googleAuth = auth;
+      const client = await auth.getClient();
+      const androidPublisher = google.androidpublisher({ version: 'v3', auth: client });
+      const { data } = await androidPublisher.purchases.subscriptionsv2.get({
+        packageName,
+        token: purchase.purchaseToken,
+      });
+
+      const lineItem = data?.lineItems?.[0] as any;
+      const expiry = lineItem?.expiryTime ?? lineItem?.expiryTimeMillis;
+      const expiresMs = expiry ? Number(expiry) : Date.now() + DEFAULT_SUBSCRIPTION_DURATION_MS;
+      const status: 'active' | 'expired' = expiresMs > Date.now() ? 'active' : 'expired';
+
+      return {
+        expiresAt: new Date(expiresMs),
+        externalId: data?.subscriptionId ?? purchase.orderId ?? purchase.purchaseToken ?? purchase.transactionId,
+        status,
+      };
+    } catch (error) {
+      console.error('[Subscription] Android receipt validation failed', error);
+      throw new Error('Android receipt validation failed');
+    }
   }
 
   async createStripeCheckout(userId: string, email: string): Promise<string> {
@@ -97,7 +242,7 @@ export class SubscriptionService {
     });
 
     await this.subscriptionRepository.save(subscription);
-    await this.updateEntitlements(userId);
+    await this.updateEntitlements(userId, subscription.expiresAt, subscription.status);
   }
 
   private async handleSubscriptionUpdate(subscription: Stripe.Subscription): Promise<void> {
@@ -108,20 +253,83 @@ export class SubscriptionService {
     if (dbSubscription) {
       dbSubscription.status = subscription.status === 'active' ? 'active' : 'expired';
       await this.subscriptionRepository.save(dbSubscription);
-      await this.updateEntitlements(dbSubscription.userId);
+      await this.updateEntitlements(dbSubscription.userId, dbSubscription.expiresAt, dbSubscription.status);
     }
   }
 
-  private async updateEntitlements(userId: string): Promise<void> {
-    const activeSubscription = await this.subscriptionRepository.findOne({
-      where: { userId, status: 'active' },
+  private async upsertSubscription(params: {
+    userId: string;
+    platform: ReceiptPlatform | 'stripe';
+    externalId?: string;
+    expiresAt: Date;
+    status: 'active' | 'expired' | 'cancelled';
+  }): Promise<Subscription> {
+    const { userId, platform, externalId, expiresAt, status } = params;
+    const existing = externalId
+      ? await this.subscriptionRepository.findOne({
+          where: { userId, platform, externalId },
+        })
+      : await this.subscriptionRepository.findOne({
+          where: { userId, platform },
+        });
+
+    if (existing) {
+      existing.expiresAt = expiresAt;
+      existing.status = status;
+      existing.externalId = externalId;
+      return this.subscriptionRepository.save(existing);
+    }
+
+    const subscription = this.subscriptionRepository.create({
+      userId,
+      platform,
+      status,
+      externalId,
+      expiresAt,
     });
 
-    if (activeSubscription) {
+    return this.subscriptionRepository.save(subscription);
+  }
+
+  private async updateEntitlements(
+    userId: string,
+    expiresAt?: Date,
+    status?: Subscription['status'],
+  ): Promise<void> {
+    const currentEntitlement = await this.entitlementRepository.findOne({
+      where: { userId, feature: 'creator_mode' },
+      order: { createdAt: 'DESC' },
+    });
+
+    let effectiveExpiry = expiresAt;
+
+    if (!effectiveExpiry) {
+      const activeSubscription = await this.subscriptionRepository.findOne({
+        where: { userId, status: 'active' },
+        order: { expiresAt: 'DESC' },
+      });
+      if (!activeSubscription) {
+        return;
+      }
+      effectiveExpiry = activeSubscription.expiresAt;
+    }
+
+    if (status && status !== 'active' && effectiveExpiry <= new Date()) {
+      if (currentEntitlement) {
+        currentEntitlement.expiresAt = effectiveExpiry;
+        await this.entitlementRepository.save(currentEntitlement);
+      }
+      return;
+    }
+
+    if (currentEntitlement) {
+      currentEntitlement.expiresAt = effectiveExpiry;
+      await this.entitlementRepository.save(currentEntitlement);
+    } else {
       const entitlement = this.entitlementRepository.create({
         userId,
         feature: 'creator_mode',
-        expiresAt: activeSubscription.expiresAt,
+        expiresAt: effectiveExpiry,
       });
 
       await this.entitlementRepository.save(entitlement);

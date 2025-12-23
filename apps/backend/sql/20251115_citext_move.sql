@@ -1,0 +1,15 @@
+BEGIN;
+
+CREATE SCHEMA IF NOT EXISTS extensions;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'citext') THEN
+    EXECUTE 'ALTER EXTENSION citext SET SCHEMA extensions';
+  ELSE
+    EXECUTE 'CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA extensions';
+  END IF;
+END;
+$$;
+
+COMMIT;

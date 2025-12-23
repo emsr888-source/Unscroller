@@ -1,36 +1,61 @@
 import { Session } from 'electron';
-import { PolicyManager } from './policy-manager';
+
+const isMainFrame = (details: { resourceType?: string }) =>
+  details.resourceType === 'mainFrame' || details.resourceType === 'navigation';
+
+const getPathAndSearch = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    return (parsed.pathname || '/') + (parsed.search || '');
+  } catch {
+    return '/';
+  }
+};
+
+const FACEBOOK_START_URL = 'https://www.facebook.com/notifications/';
+
+const fbAllowed = (url: string) =>
+  /^\/(?:[a-z]{2}(?:_[A-Z]{2})?\/)?(?:notifications(?:\/.*)?|messages\/t\/|profile\.php(?:\?.*)?$|settings(?:\/.*)?|business(?:\/.*)?|pages\/.*|composer\/.*|me\/?$)/i.test(
+    getPathAndSearch(url)
+  );
+
+const fbBlocked = (url: string) => {
+  const p = getPathAndSearch(url);
+  return (
+    /^\/(?:[a-z]{2}(?:_[A-Z]{2})?\/)?(?:$|home\.php$|watch(?:\/.*)?|videos?(?:\/.*)?|reels?(?:\/.*)?|stories(?:\/.*)?|gaming(?:\/.*)?|games(?:\/.*)?|feeds?(?:\/.*)?|bookmarks?)/i.test(
+      p
+    ) || /^\/\?(sk=|ref|refid)=/i.test(p)
+  );
+};
 
 export class WebRequestFilter {
-  constructor(private policyManager: PolicyManager) {}
-
   install(session: Session) {
-    // Intercept navigation requests
-
     session.webRequest.onBeforeRequest((details, callback) => {
-      const { url, resourceType } = details;
-      const isMain = resourceType === 'mainFrame';
+      const { url } = details;
 
-      // Never block X data APIs
-      if (/https?:\/\/x\.com\/i\//.test(url) || /https?:\/\/twitter\.com\/i\//.test(url)) {
+      if (/https?:\/\/x\.com\/i\//i.test(url)) {
         return callback({ cancel: false });
       }
 
-      // X Communities surfaces
-      if (isMain && /https?:\/\/x\.com\/(communities(\/.*)?|i\/communities(\/.*)?)/.test(url)) {
-        return callback({ redirectURL: 'https://x.com/messages' });
+      if (isMainFrame(details)) {
+        try {
+          const parsed = new URL(url);
+          if (/facebook\.com$/i.test(parsed.hostname)) {
+            if (fbBlocked(url) && !fbAllowed(url)) {
+              return callback({ redirectURL: FACEBOOK_START_URL });
+            }
+          }
+        } catch {
+          // ignore parse errors
+        }
       }
 
-      // Facebook disallowed surfaces
-      if (isMain && /https?:\/\/(m|www)\.facebook\.com\/(home\.php(?:\?.*)?$|\?(?:sk=h_\w+|ref(?:src)?=.*|refid=.*)$|watch(?:\/.*|\?.*)?$|videos?(?:\/.*|\?.*)?$|reel(?:s)?(?:\/.*|\?.*)?$|stories(?:\/.*|\?.*)?$|search(?:\/.*|\?.*)?$)/.test(url)) {
-        return callback({ redirectURL: 'https://m.facebook.com/me' });
-      }
-
-      // YouTube Safe mode ad hosts
-      if (/googleads\.g\.doubleclick\.net/.test(url) ||
-          /:\/\/.*\.doubleclick\.net\//.test(url) ||
-          /:\/\/.*\.youtube\.com\/pagead\//.test(url) ||
-          /:\/\/.*\.youtube\.com\/api\/stats\/ads\//.test(url)) {
+      if (
+        /googleads\.g\.doubleclick\.net/i.test(url) ||
+        /:\/\/.*\.doubleclick\.net\//i.test(url) ||
+        /:\/\/.*\.youtube\.com\/pagead\//i.test(url) ||
+        /:\/\/.*\.youtube\.com\/api\/stats\/ads\//i.test(url)
+      ) {
         return callback({ cancel: true });
       }
 
@@ -38,15 +63,5 @@ export class WebRequestFilter {
     });
 
     console.log('[WebRequestFilter] Installed');
-
-  }
-
-  private getProviderIdFromUrl(url: string): string | null {
-    if (url.includes('instagram.com')) return 'instagram';
-    if (url.includes('x.com') || url.includes('twitter.com')) return 'x';
-    if (url.includes('youtube.com')) return 'youtube';
-    if (url.includes('tiktok.com')) return 'tiktok';
-    if (url.includes('facebook.com')) return 'facebook';
-    return null;
   }
 }

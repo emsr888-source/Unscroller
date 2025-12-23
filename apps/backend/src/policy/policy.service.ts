@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PolicyParser } from '@creator-mode/policy-engine';
+import { PolicyParser } from '@unscroller/policy-engine';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';

@@ -41,7 +41,7 @@ Implemented a **5-layer active content blocking system** inspired by adblocker t
 - **When**: DOM ready + every MutationObserver trigger
 - **What**: Adds `preventDefault()` to anchors matching `policy.disableAnchorsTo`
 - **Feedback**: Sets `cursor: not-allowed`, `opacity: 0.5`, tooltip
-- **Example**: Home button becomes unclickable, shows "Blocked by Creator Mode"
+- **Example**: Home button becomes unclickable, shows "Blocked by Unscroller"
 
 ### Layer 4: History API Patching (domScript.js)
 - **Where**: Inside webview, patches `history` object
@@ -125,7 +125,7 @@ Scenario B: User clicks hidden home link
   → Anchor has addEventListener('click', preventDefault)
   → Click is captured
   → e.preventDefault() stops navigation
-  → Console logs: "[CreatorMode] Blocked click to: /"
+  → Console logs: "[Unscroller] Blocked click to: /"
   → Nothing happens
 
 Scenario C: Instagram SPA navigates via pushState
@@ -173,30 +173,30 @@ Converted from `policy.json`:
 When everything works, you should see:
 
 ```
-[CreatorMode] DOM Script loaded, policy: {...}
-[CreatorMode] Initializing...
-[CreatorMode] Applied 47 hide selectors
-[CreatorMode] History API patched
-[CreatorMode] MutationObserver installed
-[CreatorMode] Periodic enforcement started
-[CreatorMode] Initialization complete
+[Unscroller] DOM Script loaded, policy: {...}
+[Unscroller] Initializing...
+[Unscroller] Applied 47 hide selectors
+[Unscroller] History API patched
+[Unscroller] MutationObserver installed
+[Unscroller] Periodic enforcement started
+[Unscroller] Initialization complete
 ```
 
 ### When Blocking Occurs
 
 ```
-[CreatorMode] Path blocked: /
-[CreatorMode] Redirecting from / to /direct/inbox/
+[Unscroller] Path blocked: /
+[Unscroller] Redirecting from / to /direct/inbox/
 
 OR
 
-[CreatorMode] Blocked click to: /
+[Unscroller] Blocked click to: /
 ```
 
 ### On Allowed Pages
 
 ```
-[CreatorMode] Path allowed: /direct/inbox/
+[Unscroller] Path allowed: /direct/inbox/
 ```
 
 ## ✅ Validation Checklist
@@ -204,7 +204,7 @@ OR
 Test these scenarios to confirm blocking works:
 
 - [ ] **Click Instagram** → Opens to `/direct/inbox/`
-- [ ] **Console shows** → `[CreatorMode] DOM Script loaded`
+- [ ] **Console shows** → `[Unscroller] DOM Script loaded`
 - [ ] **Home link** → Hidden or grayed out with tooltip
 - [ ] **Click Home** → Does nothing, console shows "Blocked click"
 - [ ] **Type instagram.com/** → Immediately redirects to DMs

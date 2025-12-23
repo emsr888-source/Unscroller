@@ -166,6 +166,6 @@ if [ -f "gradlew" ]; then
 else
     echo -e "${YELLOW}⚠️  Android project not fully configured${NC}"
     echo ""
-    echo "Run: cd apps/mobile && npx expo prebuild"
+echo "Run: cd apps/mobile && npm run android"
     echo "Then run this script again"
 fi

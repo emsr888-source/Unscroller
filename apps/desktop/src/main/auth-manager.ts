@@ -4,7 +4,7 @@ import Store from 'electron-store';
 import * as keytar from 'keytar';
 
 const store = new Store();
-const SERVICE_NAME = 'creator-mode';
+const SERVICE_NAME = 'unscroller';
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://your-project.supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'your-anon-key';
 

@@ -17,6 +17,7 @@ dist
 *.pem
 .env*.local
 .vscode
+.expo/
 
 # Mobile
 apps/mobile/android/app/build

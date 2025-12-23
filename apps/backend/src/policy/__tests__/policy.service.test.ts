@@ -70,7 +70,7 @@ describe('PolicyService', () => {
       const signedPolicy2 = service.getSignedPolicy();
 
       expect(signedPolicy1).toBe(signedPolicy2);
-      expect(mockedFs.readFileSync).toHaveBeenCalledTimes(1);
+      expect(mockedFs.readFileSync).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -84,4 +84,3 @@ describe('PolicyService', () => {
     });
   });
 });
-

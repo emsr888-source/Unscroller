@@ -292,7 +292,7 @@ Result: ✅ PAGE LOADS
 
 1. **Open Desktop App**
    ```bash
-   cd /Users/onalime/CreatorMode/apps/desktop && npm run dev
+   cd /Users/onalime/Unscroller/apps/desktop && npm run dev
    ```
 
 2. **Click Instagram** → Should load DMs page
@@ -309,7 +309,7 @@ Result: ✅ PAGE LOADS
 
 ---
 
-## 🎯 Your Creator Mode Desktop App
+## 🎯 Your Unscroller Desktop App
 
 ### Perfect Balance Achieved
 

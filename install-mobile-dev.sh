@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "📱 Creator Mode - Mobile Development Installation"
+echo "📱 Unscroller - Mobile Development Installation"
 echo "================================================="
 echo ""
 echo "This will set up iOS and Android development environments"

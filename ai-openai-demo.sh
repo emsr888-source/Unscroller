@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# OpenAI-Powered AI System Demo for Creator Mode
+# OpenAI-Powered AI System Demo for Unscroller
 # This script demonstrates the enhanced AI system with OpenAI integration
 
-echo "🤖 Creator Mode AI System with OpenAI Integration"
+echo "🤖 Unscroller AI System with OpenAI Integration"
 echo "================================================"
 
 # Check if backend is running
@@ -95,7 +95,7 @@ echo "   • Discovers new distracting content patterns"
 echo "   • Updates policies with AI-generated recommendations"
 
 echo ""
-echo "🚀 Your AI-powered Creator Mode is ready!"
+echo "🚀 Your AI-powered Unscroller is ready!"
 echo "   • Basic rule-based blocking: ✅ Working"
 echo "   • OpenAI advanced analysis: ⚠️  Requires API key"
 echo "   • Daily automated updates: ✅ Scheduled"

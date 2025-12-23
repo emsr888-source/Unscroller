@@ -1,0 +1,66 @@
+{
+  "files": [],
+  "compilerOptions": {
+    "composite": false,
+    "baseUrl": ".",
+    "paths": {
+      "@unscroller/policy-engine": [
+        "packages/policy-engine/src"
+      ],
+      "@unscroller/policy-engine/*": [
+        "packages/policy-engine/src/*"
+      ],
+      "@unscroller/backend": [
+        "apps/backend/src"
+      ],
+      "@unscroller/backend/*": [
+        "apps/backend/src/*"
+      ],
+      "@unscroller/desktop": [
+        "apps/desktop/src"
+      ],
+      "@unscroller/desktop/*": [
+        "apps/desktop/src/*"
+      ],
+      "@unscroller/mobile": [
+        "apps/mobile/src"
+      ],
+      "@unscroller/mobile/*": [
+        "apps/mobile/src/*"
+      ],
+      "@unscroller/block-service": [
+        "packages/block-service/src"
+      ],
+      "@unscroller/block-service/*": [
+        "packages/block-service/src/*"
+      ],
+      "@unscroller/policy-signer": [
+        "policy/signer/src"
+      ],
+      "@unscroller/policy-signer/*": [
+        "policy/signer/src/*"
+      ]
+    }
+  },
+  "references": [
+    {
+      "path": "apps/backend"
+    },
+    {
+      "path": "apps/desktop"
+    },
+    {
+      "path": "apps/mobile"
+    },
+    {
+      "path": "packages/block-service"
+    },
+    {
+      "path": "packages/policy-engine"
+    },
+    {
+      "path": "policy/signer"
+    }
+  ],
+  "extends": "expo/tsconfig.base"
+}

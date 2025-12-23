@@ -1,4 +1,4 @@
-# 🚀 Creator Mode Apps - LAUNCHED & READY!
+# 🚀 Unscroller Apps - LAUNCHED & READY!
 
 **Status:** ✅ **ALL APPS RUNNING**  
 **Backend:** http://localhost:3001  
@@ -33,8 +33,9 @@
 ### **Mobile App (iOS/Android)**
 ```bash
 # Metro bundler is running
-# Scan QR code with Expo Go app on your phone
-# Or use iOS Simulator/Android Emulator
+# Launch simulator/emulator:
+#   npm run ios    # Xcode
+#   npm run android  # Android Studio
 
 ✅ Test Instagram:
 - Open Instagram → Should redirect to DMs ✅
@@ -138,7 +139,7 @@ Each platform has quick access buttons for:
 
 ## 🎯 **Mission Accomplished**
 
-**Creator Mode now provides the ultimate distraction-free social media experience:**
+**Unscroller now provides the ultimate distraction-free social media experience:**
 
 - ✅ **100% Home Page Blocking** across all platforms
 - ✅ **Only Essential Creator Features** remain accessible
@@ -157,7 +158,7 @@ Each platform has quick access buttons for:
 
 ---
 
-**Your Creator Mode apps are now running with maximum content blocking! 🚀**
+**Your Unscroller apps are now running with maximum content blocking! 🚀**
 
 **Test the blocking by trying to access home pages on any platform - they should all be blocked while essential features remain available.**
 

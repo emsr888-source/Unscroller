@@ -1,10 +1,10 @@
-# Creator Mode - Architecture Overview
+# Unscroller - Architecture Overview
 
 ## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Creator Mode Clients                     │
+│                    Unscroller Clients                     │
 ├─────────────┬─────────────┬────────────────┬───────────────┤
 │   iOS App   │ Android App │  Desktop App   │  Future: Web  │
 │             │             │   (Electron)   │               │
@@ -73,7 +73,7 @@ policy.json → Parser (validate) → Compiler → Platform Rules
 **WebView Enforcement** (iOS):
 ```swift
 WKContentRuleListStore.default().compileContentRuleList(
-  forIdentifier: "CreatorModeRules",
+  forIdentifier: "UnscrollerRules",
   encodedContentRuleList: rulesJSON
 )
 ```

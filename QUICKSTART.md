@@ -1,6 +1,6 @@
-# Creator Mode - Quick Start
+# Unscroller - Quick Start
 
-Get **Creator Mode** running locally in 10 minutes.
+Get **Unscroller** running locally in 10 minutes.
 
 ## Prerequisites
 
@@ -36,7 +36,7 @@ cp .env.example .env
 
 Edit `.env`:
 ```bash
-DATABASE_URL=postgresql://postgres:password@localhost:5432/creatormode
+DATABASE_URL=postgresql://postgres:password@localhost:5432/unscroller
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_JWT_SECRET=your-jwt-secret
@@ -87,29 +87,14 @@ npm run android
 
 Opens in Android Emulator (make sure one is running).
 
-### Option B: Test on Your Phone (Recommended!)
+### Option B: Test on Your Phone
 
-We've integrated **Expo Dev Client** so you can test on your real phone:
+1. Follow the simulator/emulator steps above to ensure Metro is running.
+2. For iOS, open `apps/mobile/ios/CreatorMode.xcworkspace` in Xcode, select your device, and press **Run**.
+3. For Android, connect a device with USB debugging enabled and run `npm run android`.
+4. Metro will reload your device build automatically.
 
-```bash
-cd apps/mobile
-npm install
-
-# Build the dev client once (includes native modules)
-# iOS:
-npx expo run:ios
-
-# Android:
-npx expo run:android
-
-# Then start the dev server
-npm start
-```
-
-Scan the QR code with your phone's camera (iOS) or Expo Go app (Android).
-
-📱 **See [apps/mobile/EXPO_SETUP.md](./apps/mobile/EXPO_SETUP.md) for detailed phone testing instructions.**
-
+📱 **See [apps/mobile/PHONE_TESTING_QUICK_START.md](./apps/mobile/PHONE_TESTING_QUICK_START.md) for a focused device checklist.**
 ## Step 7: Start Desktop (Optional)
 
 ```bash
@@ -210,4 +195,4 @@ npm run build
 
 **You're all set!** 🚀
 
-Start building, testing, and customizing Creator Mode.
+Start building, testing, and customizing Unscroller.

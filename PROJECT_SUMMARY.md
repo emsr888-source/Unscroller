@@ -1,10 +1,10 @@
-# Creator Mode - Project Summary
+# Unscroller - Project Summary
 
 **Status**: ✅ Complete and Production-Ready
 
 ## Overview
 
-**Creator Mode** is a comprehensive cross-platform distraction-free social browser that allows users to access essential features (DMs, Compose, Profile) on Instagram, X, YouTube, TikTok, Facebook, and Snapchat while blocking infinite-scroll surfaces like feeds, Explore, Reels, Shorts, and Spotlight.
+**Unscroller** is a comprehensive cross-platform distraction-free social browser that allows users to access essential features (DMs, Compose, Profile) on Instagram, X, YouTube, TikTok, Facebook, and Snapchat while blocking infinite-scroll surfaces like feeds, Explore, Reels, Shorts, and Spotlight.
 
 ## What Was Built
 
@@ -115,7 +115,7 @@ User Purchase → Platform Billing → Backend Verification → Entitlement → 
 ## File Structure
 
 ```
-creator-mode/
+unscroller/
 ├── apps/
 │   ├── mobile/          # React Native (iOS/Android)
 │   │   ├── src/
@@ -161,7 +161,7 @@ creator-mode/
 - `apps/mobile/App.tsx` - Root component
 - `apps/mobile/src/navigation/AppNavigator.tsx` - Navigation
 - `apps/mobile/src/screens/ProviderWebViewScreen.tsx` - WebView enforcement
-- `apps/mobile/ios/CreatorMode/PolicyWebView.swift` - iOS native module
+- `apps/mobile/ios/Unscroller/PolicyWebView.swift` - iOS native module
 - `apps/mobile/android/.../PolicyWebViewModule.kt` - Android native module
 
 ### Desktop
@@ -259,7 +259,7 @@ cd policy/signer && npm run sign
 
 ## Conclusion
 
-**Creator Mode** is a complete, production-ready application that successfully implements distraction-free browsing across all major social platforms on mobile and desktop. The architecture is modular, scalable, and compliant with all platform requirements.
+**Unscroller** is a complete, production-ready application that successfully implements distraction-free browsing across all major social platforms on mobile and desktop. The architecture is modular, scalable, and compliant with all platform requirements.
 
 The project demonstrates:
 - ✅ Advanced WebView policy enforcement

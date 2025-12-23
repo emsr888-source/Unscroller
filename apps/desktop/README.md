@@ -1,4 +1,4 @@
-# Creator Mode Desktop
+# Unscroller Desktop
 
 Electron-based desktop application with policy-enforced web browsing.
 
@@ -52,7 +52,7 @@ Set the backend URL via environment variable:
 BACKEND_URL=http://localhost:3000 npm run dev
 
 # Production
-BACKEND_URL=https://api.creatormode.com npm run dev
+BACKEND_URL=https://api.unscroller.com npm run dev
 ```
 
 Or edit `src/main/policy-manager.ts`:
@@ -63,9 +63,9 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
 ### Policy Caching
 
 Policies are cached using `electron-store` at:
-- **macOS**: `~/Library/Application Support/creator-mode-desktop/config.json`
-- **Windows**: `%APPDATA%\creator-mode-desktop\config.json`
-- **Linux**: `~/.config/creator-mode-desktop/config.json`
+- **macOS**: `~/Library/Application Support/unscroller-desktop/config.json`
+- **Windows**: `%APPDATA%\unscroller-desktop\config.json`
+- **Linux**: `~/.config/unscroller-desktop/config.json`
 
 ## 🌐 Features
 
@@ -166,7 +166,7 @@ Edit `src/main/web-request-filter.ts` to customize URL filtering.
 - `electron` - Desktop framework
 - `electron-store` - Settings persistence
 - `keytar` - Secure credential storage
-- `@creator-mode/policy-engine` - Policy parsing/compilation
+- `@unscroller/policy-engine` - Policy parsing/compilation
 - `@supabase/supabase-js` - Auth & backend
 
 **Development:**

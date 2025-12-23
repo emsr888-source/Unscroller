@@ -1,5 +1,0 @@
-#!/bin/bash
-cd /Users/onalime/CreatorMode
-
-# Open a new terminal window and run the launcher
-osascript -e 'tell application "Terminal" to do script "cd /Users/onalime/CreatorMode && ./launch-dev.sh"'

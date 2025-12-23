@@ -1,4 +1,4 @@
-# Creator Mode
+# Unscroller
 
 **Distraction-Free Social Browser** for mobile and desktop.
 
@@ -24,7 +24,7 @@ Post, DM, and manage your social profiles on Instagram, X, YouTube, TikTok, Face
 ## Monorepo Structure
 
 ```
-creator-mode/
+unscroller/
 ├── apps/
 │   ├── mobile/          # React Native (iOS/Android)
 │   ├── desktop/         # Electron app
@@ -61,20 +61,21 @@ npm run policy:sign
 
 ### 📱 Test on Your Phone
 
-We've integrated **Expo Dev Client** for easy phone testing:
+The mobile app runs with the React Native CLI:
 
 ```bash
 cd apps/mobile
 npm install
 
-# Build dev client once (includes native modules)
-npx expo run:ios    # or run:android
+# Start Metro in one terminal
+npm run start
 
-# Start dev server and scan QR code
-npm start
+# In another terminal run the platform build
+npm run ios       # requires Xcode simulator or device
+npm run android   # requires Android Studio / emulator
 ```
 
-See [apps/mobile/EXPO_SETUP.md](./apps/mobile/EXPO_SETUP.md) for detailed instructions.
+For a quick device build guide see [apps/mobile/PHONE_TESTING_QUICK_START.md](./apps/mobile/PHONE_TESTING_QUICK_START.md).
 
 ## Compliance
 
@@ -84,7 +85,7 @@ See [apps/mobile/EXPO_SETUP.md](./apps/mobile/EXPO_SETUP.md) for detailed instru
 
 ## Disclaimer
 
-Creator Mode is an independent browser overlay. Not affiliated with Instagram, X, YouTube, TikTok, Facebook, or Snapchat.
+Unscroller is an independent browser overlay. Not affiliated with Instagram, X, YouTube, TikTok, Facebook, or Snapchat.
 
 ## License
 

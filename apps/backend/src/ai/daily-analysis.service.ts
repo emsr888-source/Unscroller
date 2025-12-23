@@ -115,12 +115,13 @@ export class DailyAnalysisService implements OnModuleInit {
     }
 
     // Log summary
-    this.logger.log('📊 Daily analysis complete:', {
+    const summary = {
       totalPlatforms: platforms.length,
       successfulAnalyses: results.filter(r => !r.error).length,
       totalRecommendations: results.reduce((sum, r) => sum + (r.recommendations || 0), 0),
       totalApplied: results.reduce((sum, r) => sum + (r.applied || 0), 0)
-    });
+    };
+    this.logger.log(`📊 Daily analysis complete: ${JSON.stringify(summary)}`);
 
     // Send notification (could be webhook, email, etc.)
     await this.sendAnalysisReport(results);
@@ -147,7 +148,8 @@ export class DailyAnalysisService implements OnModuleInit {
       this.logger.log(`📈 Daily Report: ${successful.length} successful, ${failed.length} failed analyses`);
 
       if (failed.length > 0) {
-        this.logger.warn('Failed platforms:', failed.map(f => `${f.platform}: ${f.error}`));
+        const failedSummary = failed.map(f => `${f.platform}: ${f.error || 'unknown error'}`).join(', ');
+        this.logger.warn(`Failed platforms: ${failedSummary}`);
       }
     } catch (error) {
       this.logger.error('Failed to send analysis report:', error.message);

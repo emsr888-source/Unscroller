@@ -62,7 +62,7 @@ npm run desktop
 ## Project Structure
 
 ```
-creator-mode/
+unscroller/
 ├── apps/
 │   ├── mobile/          # React Native app
 │   ├── desktop/         # Electron app

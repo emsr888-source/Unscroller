@@ -1,7 +1,10 @@
 {
-  "extends": "@react-native/typescript-config/tsconfig.json",
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "baseUrl": ".",
+    "jsx": "react-native",
+    "esModuleInterop": true,
+    "types": ["expo", "node", "jest"],
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
@@ -10,7 +13,11 @@
       "@store/*": ["src/store/*"],
       "@services/*": ["src/services/*"],
       "@utils/*": ["src/utils/*"],
-      "@types/*": ["src/types/*"]
+      "@types/*": ["src/types/*"],
+      "@unscroller/policy-engine": ["../../packages/policy-engine/src"],
+      "@unscroller/policy-engine/*": ["../../packages/policy-engine/src/*"],
+      "@unscroller/block-service": ["../../packages/block-service/src"],
+      "@unscroller/block-service/*": ["../../packages/block-service/src/*"]
     }
   },
   "include": ["src/**/*"],

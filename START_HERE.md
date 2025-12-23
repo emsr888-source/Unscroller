@@ -1,4 +1,4 @@
-# 🚀 Creator Mode - START HERE
+# 🚀 Unscroller - START HERE
 
 ## ✅ Setup Complete!
 
@@ -11,7 +11,7 @@ All dependencies have been installed and configured. Here's what you can do righ
 ### 1️⃣ Backend API (Fully Ready!)
 
 ```bash
-cd /Users/onalime/CreatorMode/apps/backend
+cd /Users/onalime/Unscroller/apps/backend
 
 # Create environment file
 cp .env.example .env
@@ -26,7 +26,7 @@ npm run start:dev
 ### 2️⃣ Desktop App (Fully Ready!)
 
 ```bash
-cd /Users/onalime/CreatorMode/apps/desktop
+cd /Users/onalime/Unscroller/apps/desktop
 npm run dev
 ```
 
@@ -35,7 +35,7 @@ npm run dev
 ### 3️⃣ Mobile App - Metro Bundler (Ready!)
 
 ```bash
-cd /Users/onalime/CreatorMode/apps/mobile
+cd /Users/onalime/Unscroller/apps/mobile
 npm start
 ```
 
@@ -43,27 +43,12 @@ Then choose:
 - Press **`w`** to open in browser (web preview)
 - Press **`a`** for Android (needs Android Studio)
 - Press **`i`** for iOS (needs Xcode)
-- Or scan QR with Expo Go app on your phone
 
 ---
 
-## 📱 For Phone Testing (3 Options)
+## 📱 For Phone Testing
 
-### Option A: Expo Go (Easiest - No Xcode Needed!)
-
-1. **Install Expo Go** on your iPhone (App Store) or Android (Play Store)
-2. **Start dev server:**
-   ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile
-   npm start
-   ```
-3. **Scan QR code** that appears in terminal
-4. App opens on your phone!
-
-**Pros:** No Xcode/Android Studio needed, instant testing  
-**Cons:** Some native features won't work
-
-### Option B: iOS with Xcode (Full Features)
+### Option A: iOS with Xcode (Full Features)
 
 1. **Install Xcode** from Mac App Store (~15GB, 30-60 min)
 2. **Switch to Xcode:**
@@ -73,12 +58,12 @@ Then choose:
    ```
 3. **Install pods:**
    ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile/ios
+   cd /Users/onalime/Unscroller/apps/mobile/ios
    pod install
    ```
 4. **Run app:**
    ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile
+   cd /Users/onalime/Unscroller/apps/mobile
    npm run ios
    ```
 
@@ -97,7 +82,7 @@ Then choose:
    ```
 4. **Run app:**
    ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile
+   cd /Users/onalime/Unscroller/apps/mobile
    npm run android
    ```
 
@@ -112,22 +97,23 @@ Then choose:
 
 ```bash
 # Terminal 1 - Backend
-cd /Users/onalime/CreatorMode/apps/backend
+cd /Users/onalime/Unscroller/apps/backend
 npm run start:dev
 
 # Terminal 2 - Desktop
-cd /Users/onalime/CreatorMode/apps/desktop
+cd /Users/onalime/Unscroller/apps/desktop
 npm run dev
 ```
 
-### Mobile with Expo Go (Easiest)
+### Mobile (Simulator or Emulator)
 
 ```bash
-# Terminal 1
-cd /Users/onalime/CreatorMode/apps/mobile
-npm start
+# Terminal 1 - Metro bundler
+cd /Users/onalime/Unscroller/apps/mobile
+npm run start
 
-# On your phone: Open Expo Go app and scan QR code
+# Terminal 2 - launch platform build
+npm run ios      # or npm run android
 ```
 
 ---
@@ -142,7 +128,7 @@ npm start
 | Desktop | ✅ Ready | Run immediately |
 | Mobile - Metro | ✅ Ready | Dev server works |
 | Mobile - iOS | ⚠️ Needs Xcode | Install from App Store |
-| Mobile - Android | ⚠️ Needs Android Studio | Or use Expo Go |
+| Mobile - Android | ⚠️ Needs Android Studio | Configure emulator |
 | CocoaPods | ✅ Installed | Via Homebrew |
 
 ---
@@ -152,14 +138,14 @@ npm start
 ### Backend (.env file)
 
 ```bash
-cd /Users/onalime/CreatorMode/apps/backend
+cd /Users/onalime/Unscroller/apps/backend
 cp .env.example .env
 nano .env  # or use any text editor
 ```
 
 Add your credentials:
 ```env
-DATABASE_URL=postgresql://user:pass@localhost:5432/creatormode
+DATABASE_URL=postgresql://user:pass@localhost:5432/unscroller
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_JWT_SECRET=your-jwt-secret
@@ -191,9 +177,9 @@ const BACKEND_URL = 'http://192.168.1.XXX:3000';
 
 ### Project Structure
 ```
-CreatorMode/
+Unscroller/
 ├── apps/
-│   ├── mobile/          # React Native + Expo
+│   ├── mobile/          # React Native (bare)
 │   │   ├── src/
 │   │   │   ├── screens/       # App screens
 │   │   │   ├── services/      # API calls
@@ -257,14 +243,14 @@ lsof -ti:8081 | xargs kill -9
 
 ### Clear caches
 ```bash
-cd /Users/onalime/CreatorMode
+cd /Users/onalime/Unscroller
 rm -rf node_modules apps/*/node_modules packages/*/node_modules
 npm install
 ```
 
 ### Rebuild policy engine
 ```bash
-cd /Users/onalime/CreatorMode/packages/policy-engine
+cd /Users/onalime/Unscroller/packages/policy-engine
 npm run build
 ```
 
@@ -298,12 +284,7 @@ npm run build
    npm run start:dev
    ```
 
-3. **Test Mobile** (Expo Go - no Xcode needed):
-   - Install Expo Go on phone
-   - Run `npm start` in apps/mobile
-   - Scan QR code
-
-4. **Install Xcode** (if you want full iOS features):
+3. **Install Xcode** (if you want full iOS features):
    - Download from App Store
    - Follow Option B above
 
@@ -315,11 +296,11 @@ npm run build
 
 ✅ Backend & Desktop can run **right now**  
 ✅ Mobile dev server works **immediately**  
-⚠️ iOS needs **Xcode** (optional, can use Expo Go instead)  
-⚠️ Android needs **Android Studio** (optional, can use Expo Go instead)
+⚠️ iOS needs **Xcode** for simulator/device builds  
+⚠️ Android needs **Android Studio** for emulator/device builds
 
 **Choose your path:**
-- **Quick Testing:** Use Expo Go on your phone
+- **Quick Testing:** Run Metro + `npm run ios/android`
 - **Full iOS:** Install Xcode
 - **Full Android:** Install Android Studio
 - **Desktop Only:** Start developing immediately!
@@ -329,6 +310,6 @@ npm run build
 **Happy Coding!** 🚀
 
 For questions, see the docs folder or check specific guides:
-- Mobile testing: `apps/mobile/EXPO_SETUP.md`
+- Mobile testing: `apps/mobile/PHONE_TESTING_QUICK_START.md`
 - Status report: `SETUP_STATUS.md`
 - Verification: Run `./verify-setup.sh`

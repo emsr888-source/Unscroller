@@ -21,14 +21,14 @@
 
 ### 1. Start the Desktop App ✅
 ```bash
-cd /Users/onalime/CreatorMode/apps/desktop
+cd /Users/onalime/Unscroller/apps/desktop
 npm run dev
 ```
 **Works immediately** - no additional setup!
 
 ### 2. Start the Backend API ✅
 ```bash
-cd /Users/onalime/CreatorMode/apps/backend
+cd /Users/onalime/Unscroller/apps/backend
 cp .env.example .env
 # Edit .env with your credentials
 npm run start:dev
@@ -51,7 +51,7 @@ npm run start:dev
    - Download: API Level 34 system image
 5. **Run setup script**:
    ```bash
-   cd /Users/onalime/CreatorMode
+   cd /Users/onalime/Unscroller
    ./setup-android.sh
    ```
 6. **Start AVD** and run app:
@@ -70,7 +70,7 @@ npm run start:dev
 4. **Wait for installation** (~30-60 minutes)
 5. **Run setup script**:
    ```bash
-   cd /Users/onalime/CreatorMode
+   cd /Users/onalime/Unscroller
    ./setup-ios.sh
    ```
 6. **Run app**:
@@ -81,25 +81,22 @@ npm run start:dev
 
 ---
 
-## 📱 Quick Mobile Testing (No Xcode/Android Studio!)
+## 📱 Quick Mobile Testing (Simulator/Emulator)
 
-### Expo Go Method (Easiest!)
-
-1. **Install Expo Go** on your phone:
-   - iOS: App Store
-   - Android: Play Store
-
-2. **Start dev server**:
+1. **Start Metro bundler**:
    ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile
-   npm start
+   cd /Users/onalime/Unscroller/apps/mobile
+   npm run start
    ```
+2. **Launch a platform build** in another terminal:
+   ```bash
+   # iOS Simulator
+   npm run ios
 
-3. **Scan QR code** with phone camera (iOS) or Expo Go app (Android)
-
-4. **App opens instantly** on your phone!
-
-**Note:** Some native features won't work in Expo Go, but you can test most functionality.
+   # or Android Emulator (requires one running)
+   npm run android
+   ```
+3. Metro reloads changes automatically while the simulator/emulator is open.
 
 ---
 
@@ -129,7 +126,7 @@ source ~/.zshrc
 ### ✅ Verify Setup
 
 ```bash
-cd /Users/onalime/CreatorMode
+cd /Users/onalime/Unscroller
 ./verify-setup.sh
 ```
 
@@ -160,10 +157,9 @@ cd /Users/onalime/CreatorMode
 - [ ] Test: `npm run ios`
 
 ### Optional (Testing)
-- [ ] Install Expo Go on phone
-- [ ] Test with QR code
-- [ ] Configure backend .env
-- [ ] Set up Supabase
+- [ ] Connect a physical device (enable developer mode)
+- [ ] Verify backend `.env` values
+- [ ] Set up Supabase project
 
 ---
 
@@ -171,7 +167,7 @@ cd /Users/onalime/CreatorMode
 
 ### Path 1: Desktop Development (Instant!)
 ```bash
-cd /Users/onalime/CreatorMode/apps/desktop
+cd /Users/onalime/Unscroller/apps/desktop
 npm run dev
 ```
 Start developing desktop app immediately!
@@ -189,10 +185,9 @@ Start developing desktop app immediately!
 3. Run `npm run ios`
 
 ### Path 4: Quick Mobile Test (5 min!)
-1. Install Expo Go on phone
-2. `npm start` in apps/mobile
-3. Scan QR code
-4. Test on phone!
+1. `npm run start` in `apps/mobile`
+2. `npm run ios` or `npm run android`
+3. Make UI changes and confirm Metro hot reload
 
 ---
 
@@ -287,7 +282,7 @@ lsof -ti:8081 | xargs kill -9
 
 ### Project Structure
 ```
-/Users/onalime/CreatorMode/
+/Users/onalime/Unscroller/
 ├── apps/
 │   ├── mobile/          ← React Native app
 │   ├── backend/         ← NestJS API
@@ -381,12 +376,12 @@ You'll know setup is complete when:
 **What's needed**: Xcode installation (manual), Android SDK setup (15 min), iOS pods (after Xcode)
 
 **Next recommended step**: 
-1. **Quick test**: Run desktop app or test mobile with Expo Go
+1. **Quick test**: Run desktop app or launch the mobile simulator (`npm run start` + `npm run ios/android`)
 2. **Full setup**: Complete Android Studio setup OR install Xcode
 
 ---
 
-**Project Location**: `/Users/onalime/CreatorMode/`
+**Project Location**: `/Users/onalime/Unscroller/`
 
 **Installation Date**: October 15, 2025
 

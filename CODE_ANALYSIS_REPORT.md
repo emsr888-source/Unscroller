@@ -1,4 +1,4 @@
-# Creator Mode - Comprehensive Code Analysis Report
+# Unscroller - Comprehensive Code Analysis Report
 
 **Generated:** October 16, 2025  
 **Status:** Complete Analysis
@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-**Creator Mode** is a sophisticated cross-platform distraction-free social media browser built with a monorepo architecture. It blocks infinite-scroll content (feeds, Reels, Shorts, Stories) while allowing essential features (DMs, posting, profiles) across 6 major platforms: Instagram, X (Twitter), YouTube, TikTok, Facebook, and Snapchat.
+**Unscroller** is a sophisticated cross-platform distraction-free social media browser built with a monorepo architecture. It blocks infinite-scroll content (feeds, Reels, Shorts, Stories) while allowing essential features (DMs, posting, profiles) across 6 major platforms: Instagram, X (Twitter), YouTube, TikTok, Facebook, and Snapchat.
 
 ### Overall Assessment: ✅ Well-Architected, ⚠️ Some Issues Found
 
@@ -34,7 +34,7 @@ The application acts as a controlled browser/WebView wrapper that:
 - **Scheduling:** node-cron for daily policy updates
 
 #### Mobile (React Native)
-- **Framework:** React Native 0.74 (Bare workflow + Expo)
+- **Framework:** React Native 0.74 (bare workflow)
 - **State:** Zustand + React Query
 - **Storage:** MMKV (fast key-value storage)
 - **Subscriptions:** RevenueCat wrapper (react-native-purchases)
@@ -607,7 +607,7 @@ GET  /api/ai/openai-usage
 
 ## 12. Conclusion
 
-**Creator Mode is a well-architected, feature-rich application with innovative AI capabilities.** The core concept is sound, the technology choices are appropriate, and the implementation is generally solid.
+**Unscroller is a well-architected, feature-rich application with innovative AI capabilities.** The core concept is sound, the technology choices are appropriate, and the implementation is generally solid.
 
 ### Main Strengths:
 1. Sophisticated policy engine with multi-platform support
@@ -669,4 +669,3 @@ GET  /api/ai/openai-usage
 **Date:** October 16, 2025  
 **Files Analyzed:** 50+ across backend, mobile, desktop, and shared packages  
 **Total Lines of Code:** ~10,000+
-

@@ -1,4 +1,4 @@
-# 📱 Creator Mode - Installation Complete! 🎉
+# 📱 Unscroller - Installation Complete! 🎉
 
 ## 🚀 TL;DR - What Can You Do RIGHT NOW?
 
@@ -6,16 +6,16 @@
 
 ```bash
 # 1. Test Desktop App (Opens instantly!)
-cd /Users/onalime/CreatorMode/apps/desktop
+cd /Users/onalime/Unscroller/apps/desktop
 npm run dev
 
-# 2. Test Mobile with Expo Go (5 minutes!)
-cd /Users/onalime/CreatorMode/apps/mobile
-npm start
-# Then scan QR with Expo Go app on your phone
+# 2. Test Mobile in Simulator/Emulator
+cd /Users/onalime/Unscroller/apps/mobile
+npm run start
+# In another terminal: npm run ios  (or npm run android)
 
 # 3. Start Backend API
-cd /Users/onalime/CreatorMode/apps/backend
+cd /Users/onalime/Unscroller/apps/backend
 cp .env.example .env  # Edit this first!
 npm run start:dev
 ```
@@ -40,19 +40,23 @@ npm run start:dev
 ## 🎯 Choose Your Path
 
 ### Path A: Quick Mobile Test (5 Minutes!)
-**Best for:** Immediate testing without Xcode/Android Studio
+**Best for:** Verifying UI quickly in a simulator or emulator
 
-1. Install **Expo Go** on your phone (App Store/Play Store)
-2. Run:
+1. Run Metro bundler:
    ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile
-   npm start
+   cd /Users/onalime/Unscroller/apps/mobile
+   npm run start
    ```
-3. Scan QR code with your phone
-4. **Done!** App runs on your phone
+2. In another terminal launch a platform build:
+   ```bash
+   npm run ios       # requires Xcode
+   # or
+   npm run android   # requires Android emulator running
+   ```
+3. Make changes in `apps/mobile/src` and watch Metro hot-reload.
 
-**Pros:** Instant, no setup  
-**Cons:** Some native features won't work
+**Pros:** Native experience, instant reloads  
+**Cons:** Requires simulator/emulator tooling
 
 ---
 
@@ -64,7 +68,7 @@ npm run start:dev
 3. **Create AVD**: Virtual Device Manager → Create Pixel 6 device
 4. **Run setup**:
    ```bash
-   cd /Users/onalime/CreatorMode
+   cd /Users/onalime/Unscroller
    ./setup-android.sh
    ```
 5. **Start AVD** and run:
@@ -84,7 +88,7 @@ npm run start:dev
 1. **Install Xcode** from App Store (~15GB, 30-60 min)
 2. **Run setup**:
    ```bash
-   cd /Users/onalime/CreatorMode
+   cd /Users/onalime/Unscroller
    ./setup-ios.sh
    ```
 3. **Run app**:
@@ -102,7 +106,7 @@ npm run start:dev
 **Best for:** Starting development without mobile setup
 
 ```bash
-cd /Users/onalime/CreatorMode/apps/desktop
+cd /Users/onalime/Unscroller/apps/desktop
 npm run dev
 ```
 
@@ -115,7 +119,7 @@ npm run dev
 
 ```bash
 # Navigate to project
-cd /Users/onalime/CreatorMode
+cd /Users/onalime/Unscroller
 
 # Desktop app (works now!)
 cd apps/desktop && npm run dev
@@ -218,7 +222,7 @@ export ANDROID_HOME=/path/to/sdk
 
 Run this to check everything:
 ```bash
-cd /Users/onalime/CreatorMode
+cd /Users/onalime/Unscroller
 ./verify-setup.sh
 ```
 
@@ -231,10 +235,10 @@ cd /Users/onalime/CreatorMode
    cd apps/desktop && npm run dev
    ```
 
-2. **Test Mobile** with Expo Go (5 min):
+2. **Test Mobile** in a simulator (5 min):
    ```bash
-   cd apps/mobile && npm start
-   # Scan QR with phone
+   cd apps/mobile && npm run start
+   # in another terminal: npm run ios   # or npm run android
    ```
 
 3. **Complete Android Studio** setup (15 min):
@@ -267,7 +271,7 @@ cd /Users/onalime/CreatorMode
 
 **🚀 You Can Start Developing:**
 - Desktop: **Right now!**
-- Mobile (Expo Go): **Right now!**
+- Mobile (Simulator/Emulator): **Right now!**
 - Android: **15 min setup**
 - iOS: **After Xcode install**
 
@@ -275,4 +279,4 @@ cd /Users/onalime/CreatorMode
 
 **Choose your path above and start building!** 🎨
 
-**Project Location**: `/Users/onalime/CreatorMode/`
+**Project Location**: `/Users/onalime/Unscroller/`

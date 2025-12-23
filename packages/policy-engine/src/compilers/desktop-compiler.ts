@@ -84,7 +84,7 @@ export class DesktopCompiler {
             el.setAttribute('data-cm-hidden', 'true');
           });
         } catch (e) {
-          console.warn('[CreatorMode] Failed to hide:', selector, e);
+          console.warn('[Unscroller] Failed to hide:', selector, e);
         }
       });
     },
@@ -100,14 +100,14 @@ export class DesktopCompiler {
             }, true);
           });
         } catch (e) {
-          console.warn('[CreatorMode] Failed to disable anchors:', path, e);
+          console.warn('[Unscroller] Failed to disable anchors:', path, e);
         }
       });
     },
     
     showBlockNotification(path) {
       const notification = document.createElement('div');
-      notification.textContent = 'Creator Mode: This section is blocked';
+      notification.textContent = 'Unscroller: This section is blocked';
       notification.style.cssText = \`
         position: fixed;
         top: 20px;

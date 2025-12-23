@@ -12,13 +12,14 @@ const TITLEBAR_HEIGHT = 48;
 let contentView: BrowserView | null = null;
 let activeProviderId: string | null = null;
 let insertedCssKey: string | null = null;
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 const fallbackTargets: Record<string, string> = {
   instagram: 'https://www.instagram.com/direct/inbox/',
   x: 'https://x.com/messages',
-  youtube: 'https://m.youtube.com/feed/subscriptions',
-  tiktok: 'https://www.tiktok.com/upload',
-  facebook: 'https://m.facebook.com/messages/',
+  youtube: 'https://www.youtube.com/feed/you?app=desktop',
+  tiktok: 'https://www.tiktok.com/tiktokstudio/upload?from=webapp',
+  facebook: 'https://www.facebook.com/notifications/',
 };
 
 function updateBrowserViewBounds() {
@@ -40,15 +41,38 @@ function ensureBrowserView(): BrowserView | null {
     return null;
   }
   if (!contentView) {
+    const preloadPath = path.join(__dirname, 'preload.js');
+    const preloadOptions = fs.existsSync(preloadPath) ? { preload: preloadPath } : {};
+    if (!preloadOptions.preload) {
+      console.warn('[electron] preload missing at', preloadPath, '— running without preload.');
+    }
+
     contentView = new BrowserView({
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
         partition: 'persist:main',
+        ...preloadOptions,
       },
     });
     mainWindow.setBrowserView(contentView);
     updateBrowserViewBounds();
+
+    if (isDevelopment) {
+      try {
+        contentView.webContents.openDevTools({ mode: 'detach' });
+      } catch (error) {
+        console.warn('[Main] Failed to open BrowserView devtools:', error);
+      }
+    }
+
+    // Always expose console output so we can debug auth flows even in production builds
+    contentView.webContents.on('console-message', (_event, level, message, line, sourceId) => {
+      const levelLabel = ['LOG', 'WARN', 'ERROR'][level] ?? 'LOG';
+      console.log(`[BrowserView][${levelLabel}] ${sourceId}:${line} ${message}`);
+    });
+
+    contentView.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   }
   return contentView;
 }
@@ -75,11 +99,15 @@ async function preparePolicyForProvider(providerId: string) {
     console.error('[Main] Failed to read domScript.js:', error);
   }
 
+  const startUrlOverride =
+    providerId === 'youtube' ? getProviderStartUrl(providerId) : providerPolicy.start || getProviderStartUrl(providerId);
+
   const policyForProvider = {
     allow: providerPolicy.allow || [],
+    block: providerPolicy.block || [],
     hideSelectors: providerPolicy.dom?.hide || [],
     disableAnchorsTo: providerPolicy.dom?.disableAnchorsTo || [],
-    start: getProviderStartUrl(providerId),
+    start: startUrlOverride,
   };
 
   return { policyForProvider, domScript };
@@ -89,6 +117,14 @@ async function loadProviderInBrowserView(providerId: string, targetUrl?: string)
   const view = ensureBrowserView();
   if (!view) {
     return { success: false };
+  }
+
+  if (providerId === 'facebook') {
+    view.webContents.setUserAgent(
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
+    );
+  } else {
+    view.webContents.setUserAgent(app.userAgentFallback);
   }
 
   activeProviderId = providerId;
@@ -157,6 +193,7 @@ async function loadProviderInBrowserView(providerId: string, targetUrl?: string)
   view.webContents.removeAllListeners('dom-ready');
   view.webContents.removeAllListeners('did-finish-load');
   view.webContents.removeAllListeners('did-navigate-in-page');
+  view.webContents.removeAllListeners('did-fail-load');
 
   if (providerId !== 'facebook') {
     view.webContents.on('dom-ready', () => schedulePolicyInjection());
@@ -181,6 +218,39 @@ async function loadProviderInBrowserView(providerId: string, targetUrl?: string)
   await view.webContents.loadURL(startUrl);
   if (providerId !== 'facebook') {
     schedulePolicyInjection();
+  }
+
+  if (providerId === 'instagram') {
+    const instagramFallbacks = [
+      'https://www.instagram.com/direct/inbox/',
+      'https://www.instagram.com/accounts/login/'
+    ];
+    let fallbackIndex = 0;
+
+    view.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+      if (!isMainFrame) {
+        return;
+      }
+
+      // Ignore expected aborts triggered by deliberate navigation changes
+      if (errorCode === -3 /* ERR_ABORTED */) {
+        return;
+      }
+
+      console.warn(
+        `[BrowserView] Load failed for instagram (${errorCode} - ${errorDescription}) at ${validatedURL}`
+      );
+
+      fallbackIndex = Math.min(fallbackIndex + 1, instagramFallbacks.length - 1);
+      const nextUrl = instagramFallbacks[fallbackIndex];
+
+      view.webContents
+        .loadURL(nextUrl)
+        .then(() => schedulePolicyInjection())
+        .catch(err =>
+          console.error('[BrowserView] Failed to recover Instagram load failure:', err)
+        );
+    });
   }
   return { success: true };
 }
@@ -221,6 +291,9 @@ function attachNavigationGuards(view: BrowserView, providerId: string, fallbackU
   });
 
   view.webContents.setWindowOpenHandler(({ url }) => {
+    if (isDevelopment) {
+      return { action: 'allow' };
+    }
     if (policyManager.isNavigationAllowed(providerId, url)) {
       return { action: 'allow' };
     }
@@ -232,6 +305,11 @@ function attachNavigationGuards(view: BrowserView, providerId: string, fallbackU
 }
 
 async function createWindow() {
+  const assetsRoot = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(app.getAppPath(), 'assets');
+  const windowIconPath = path.join(assetsRoot, 'unscroller-icon.png');
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -244,8 +322,13 @@ async function createWindow() {
     },
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#000000',
+    icon: windowIconPath,
     show: false, // Don't show until ready
   });
+
+  if (process.platform === 'darwin' && fs.existsSync(windowIconPath) && app.dock) {
+    app.dock.setIcon(windowIconPath);
+  }
 
   // Load the app
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
@@ -284,7 +367,7 @@ async function setupPolicyEnforcement() {
   }
 
   // Set up web request filtering
-  const filter = new WebRequestFilter(policyManager);
+  const filter = new WebRequestFilter();
   filter.install(session.defaultSession);
 }
 
@@ -339,9 +422,9 @@ function getProviderStartUrl(providerId: string): string {
   const urls: Record<string, string> = {
     instagram: 'https://www.instagram.com/direct/inbox/',
     x: 'https://x.com/messages',
-    youtube: 'https://m.youtube.com/feed/subscriptions',
-    tiktok: 'https://www.tiktok.com/upload',
-    facebook: 'https://m.facebook.com/messages/',
+    youtube: 'https://www.youtube.com/feed/you?app=desktop',
+    tiktok: 'https://www.tiktok.com/tiktokstudio/upload?from=webapp',
+    facebook: 'https://www.facebook.com/notifications/',
   };
   return urls[providerId] || '/';
 }

@@ -1,4 +1,4 @@
-# Creator Mode - Fixes Applied ✅
+# Unscroller - Fixes Applied ✅
 
 **Date:** October 16, 2025  
 **Status:** All critical and high-priority issues fixed
@@ -60,7 +60,7 @@ Successfully fixed **all 12 critical and high-priority issues** identified in th
 
 **Configuration:**
 ```env
-ALLOWED_ORIGINS=http://localhost:3001,http://localhost:19006,https://app.creatormode.com
+ALLOWED_ORIGINS=http://localhost:3001,http://localhost:19006,https://app.unscroller.com
 ```
 
 ---
@@ -100,7 +100,7 @@ ALLOWED_ORIGINS=http://localhost:3001,http://localhost:19006,https://app.creator
 **Configuration:**
 ```env
 ENABLE_DATABASE=true
-DATABASE_URL=postgresql://user:pass@localhost:5432/creatormode
+DATABASE_URL=postgresql://user:pass@localhost:5432/unscroller
 ```
 
 ---
@@ -315,7 +315,7 @@ npm run start:dev
 # ✅ Policy keys loaded
 # ✅ OpenAI service initialized (Daily budget: $10.00)
 # ✅ Daily AI scheduler disabled (opt-in)
-# 🚀 Creator Mode Backend running on http://localhost:3000
+# 🚀 Unscroller Backend running on http://localhost:3000
 ```
 
 ### 3. Test Policy Engine
@@ -337,7 +337,7 @@ cd apps/mobile
 export REACT_APP_DEV_API_URL=http://192.168.1.100:3000
 
 npm start
-# Scan QR code with Expo Go or physical device
+# In another terminal run: npm run ios   # or npm run android
 ```
 
 ### 5. Test AI Budget Controls
@@ -418,7 +418,7 @@ All fixes are documented in:
 
 **12/12 critical and high-priority issues fixed** 🎉
 
-The Creator Mode codebase is now:
+The Unscroller codebase is now:
 - ✅ **Secure** - CORS whitelist, rate limiting, webhook verification
 - ✅ **Cost-controlled** - AI budget limits and monitoring
 - ✅ **Developer-friendly** - Complete environment setup, working tests
@@ -433,4 +433,3 @@ The Creator Mode codebase is now:
 **Last Updated:** October 16, 2025  
 **Fixes Applied By:** AI Code Assistant  
 **Tests:** 15/15 passing ✅
-

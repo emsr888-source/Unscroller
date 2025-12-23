@@ -113,7 +113,7 @@ export class URLDiscoveryService implements OnModuleInit, OnModuleDestroy {
       tiktok: [
         'https://www.tiktok.com/',
         'https://www.tiktok.com/foryou',
-        'https://www.tiktok.com/upload'
+        'https://www.tiktok.com/tiktokstudio/upload?from=webapp'
       ],
       facebook: [
         'https://www.facebook.com/',

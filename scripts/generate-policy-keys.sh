@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Creator Mode - Policy Key Generation Script
+# Unscroller - Policy Key Generation Script
 # Generates RSA key pair for signing policies
 
 set -e
 
-echo "🔑 Creator Mode - Policy Key Generation"
+echo "🔑 Unscroller - Policy Key Generation"
 echo "========================================"
 
 # Create keys directory

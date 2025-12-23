@@ -1,30 +1,28 @@
+import 'reflect-metadata';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import * as sharedUtils from '@nestjs/common/utils/shared.utils';
 import { AppModule } from './app.module';
 import rateLimit from 'express-rate-limit';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+if (typeof (sharedUtils as any).addLeadingSlash !== 'function') {
+  (sharedUtils as any).addLeadingSlash = (path?: string) => {
+    if (!path) {
+      return '';
+    }
+    return path.startsWith('/') ? path : `/${path}`;
+  };
+}
 
-  // CORS configuration with whitelist for security
-  const allowedOrigins = process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-    : ['http://localhost:3001', 'http://localhost:19006'];
-  
-  app.enableCors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, Postman, etc.)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.warn(`CORS blocked origin: ${origin}`);
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
   });
+
+  app.enableCors({ origin: true, credentials: false });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -54,10 +52,29 @@ async function bootstrap() {
   app.use('/api/', generalLimiter);
   app.use('/api/ai/', aiLimiter);
 
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 3001;
   await app.listen(port);
   
-  console.log(`🚀 Creator Mode Backend running on http://localhost:${port}`);
+  console.log(`🚀 Unscroller Backend running on http://localhost:${port}`);
+
+  try {
+    const server: any = app.getHttpAdapter().getHttpServer();
+    const router = server?._events?.request?._router;
+    if (router?.stack) {
+      const routes = router.stack
+        .filter((layer: any) => layer.route)
+        .map((layer: any) => {
+          const methods = Object.keys(layer.route.methods)
+            .filter(method => layer.route.methods[method])
+            .map(method => method.toUpperCase())
+            .join(',');
+          return `${methods} ${layer.route.path}`;
+        });
+      console.log('[Routes]', routes);
+    }
+  } catch (error) {
+    console.warn('[Routes] Failed to enumerate routes:', error);
+  }
 }
 
 bootstrap();

@@ -1,12 +1,13 @@
 {
-  "name": "creator-mode",
+  "name": "unscroller",
   "version": "1.0.0",
   "private": true,
-  "description": "Creator Mode - Distraction-Free Social Browser",
-  "packageManager": "npm@10.2.4",
+  "description": "Unscroller - Distraction-Free Social Browser",
+  "packageManager": "yarn@4.5.1",
   "workspaces": [
     "apps/*",
     "packages/*",
+    "packages/block-service",
     "policy/signer"
   ],
   "scripts": {
@@ -14,18 +15,54 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
+    "postinstall": "patch-package",
     "clean": "turbo run clean && rm -rf node_modules",
     "mobile": "cd apps/mobile && npm start",
     "desktop": "cd apps/desktop && npm run dev",
     "backend": "cd apps/backend && npm run start:dev",
-    "desktop:rebuild:dev": "npm run rebuild:dev --workspace=@creator-mode/desktop",
-    "desktop:release": "npm run rebuild:release --workspace=@creator-mode/desktop",
-    "desktop:package:all": "npm run package:all --workspace=@creator-mode/desktop",
-    "policy:sign": "cd policy && npm run sign"
+    "desktop:rebuild:dev": "npm run rebuild:dev --workspace=@unscroller/desktop",
+    "desktop:release": "npm run rebuild:release --workspace=@unscroller/desktop",
+    "desktop:package:all": "npm run package:all --workspace=@unscroller/desktop",
+    "policy:sign": "cd policy/signer && npm run sign",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
+  },
+  "overrides": {
+    "@react-native-community/cli": "13.6.9",
+    "@react-native-community/cli-clean": "13.6.9",
+    "@react-native-community/cli-config": "13.6.9",
+    "@react-native-community/cli-debugger-ui": "13.6.9",
+    "@react-native-community/cli-doctor": "13.6.9",
+    "@react-native-community/cli-hermes": "13.6.9",
+    "@react-native-community/cli-platform-android": "13.6.9",
+    "@react-native-community/cli-platform-apple": "13.6.9",
+    "@react-native-community/cli-platform-ios": "13.6.9",
+    "@react-native-community/cli-server-api": "13.6.9",
+    "@react-native-community/cli-tools": "13.6.9",
+    "@react-native-community/cli-types": "13.6.9",
+    "validator": "13.15.20",
+    "react-native-webview": "13.6.4",
+    "signal-exit": "3.0.7"
+  },
+  "resolutions": {
+    "signal-exit": "3.0.7"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/runtime": "^7.28.4",
+    "@react-native/codegen": "^0.74.89",
+    "@types/babel__core": "^7",
+    "@types/babel__preset-env": "^7",
+    "@types/node": "^24.9.1",
+    "@types/react": "~19.1.10",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0",
     "prettier": "^3.1.0",
     "turbo": "^2.0.0",
     "typescript": "^5.3.0"
@@ -33,5 +70,14 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "expo": "~54.0.25",
+    "expo-dev-client": "~6.0.18",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-color-picker": "^0.6.0",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-worklets": "0.5.1"
   }
 }

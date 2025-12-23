@@ -1,98 +1,153 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, useWindowDimensions, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '@/navigation/AppNavigator';
+import { RootStackParamList } from '../navigation/AppNavigator';
+import { COLORS } from '../core/theme/colors';
+import { TYPOGRAPHY } from '../core/theme/typography';
+import { SPACING } from '../core/theme/spacing';
+import { BRANDING } from '../assets/branding';
+import { PrimaryButton } from '../features/onboarding/components/PrimaryButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
 export default function WelcomeScreen({ navigation }: Props) {
+  const { height } = useWindowDimensions();
+  const isCompact = height < 720;
+
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['rgba(238,237,230,0.94)', 'rgba(238,237,230,0.86)']} style={styles.container}>
+      <ImageBackground
+        source={BRANDING.background}
+        resizeMode="cover"
+        style={StyleSheet.absoluteFill}
+        imageStyle={styles.backgroundImage}
+        blurRadius={2}
+        accessibilityIgnoresInvertColors
+      />
+      <StatusBar barStyle="dark-content" translucent={false} backgroundColor={COLORS.BACKGROUND_MAIN} />
+      <SafeAreaView style={[styles.safeArea, isCompact && styles.safeAreaCompact]} edges={['top', 'bottom']}>
       <View style={styles.content}>
-        <Text style={styles.title}>Creator Mode</Text>
-        <Text style={styles.subtitle}>Distraction-Free Social Browser</Text>
+        <View style={styles.logoRow}>
+          <View style={styles.logoCircle}>
+            <Text style={styles.logoInitial}>U</Text>
+          </View>
+          <View>
+            <Text style={styles.title}>Unscroller</Text>
+            <Text style={styles.subtitle}>Distraction-Free Social Browser</Text>
+          </View>
+        </View>
         <Text style={styles.description}>
           Post, DM, and manage your social profiles—{'\n'}
-          without feeds, Reels, Shorts, or Spotlight
+          without feeds, Reels, Shorts, or Spotlight.
         </Text>
 
         <View style={styles.providers}>
           <Text style={styles.providersText}>
-            📷 Instagram • 𝕏 X • ▶️ YouTube{'\n'}
-            🎵 TikTok • 👤 Facebook • 👻 Snapchat
+            Instagram • X • YouTube • TikTok{'\n'}
+            Facebook • Snapchat
           </Text>
         </View>
       </View>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Auth')}>
-          <Text style={styles.buttonText}>Get Started</Text>
-        </TouchableOpacity>
+        <PrimaryButton title="Get Started" onPress={() => navigation.navigate('Auth')} style={styles.primaryButton} />
 
         <Text style={styles.disclaimer}>
           Independent browser. Not affiliated with any social platform.
         </Text>
       </View>
-    </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-    padding: 24,
+  },
+  backgroundImage: {
+    opacity: 0.9,
+  },
+  safeArea: {
+    flex: 1,
+    paddingHorizontal: SPACING.space_5,
+    paddingTop: SPACING.space_6,
+    paddingBottom: SPACING.space_6,
+  },
+  safeAreaCompact: {
+    paddingTop: SPACING.space_4,
+    paddingBottom: SPACING.space_4,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
+    gap: SPACING.space_5,
+  },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.space_3,
+  },
+  logoCircle: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: 'rgba(77, 161, 255, 0.14)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(77, 161, 255, 0.28)',
+  },
+  logoInitial: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: COLORS.TEXT_PRIMARY,
   },
   title: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
+    ...TYPOGRAPHY.H1,
+    color: COLORS.TEXT_PRIMARY,
+    textTransform: 'none',
   },
   subtitle: {
-    fontSize: 20,
-    color: '#888',
-    marginBottom: 24,
+    ...TYPOGRAPHY.Subtext,
+    color: COLORS.TEXT_SECONDARY,
+    marginTop: SPACING.space_1,
   },
   description: {
-    fontSize: 16,
-    color: '#ccc',
-    lineHeight: 24,
-    marginBottom: 48,
+    ...TYPOGRAPHY.Body,
+    color: COLORS.TEXT_PRIMARY,
+    marginBottom: SPACING.space_5,
   },
   providers: {
-    padding: 16,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
+    padding: SPACING.space_4,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.GLASS_BORDER,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
   },
   providersText: {
-    fontSize: 16,
-    color: '#fff',
+    ...TYPOGRAPHY.Body,
+    color: COLORS.TEXT_PRIMARY,
     textAlign: 'center',
-    lineHeight: 28,
+    lineHeight: 24,
   },
   footer: {
-    paddingBottom: 24,
+    gap: SPACING.space_3,
   },
-  button: {
-    backgroundColor: '#fff',
-    padding: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
+  primaryButton: {
+    width: '100%',
   },
   disclaimer: {
     fontSize: 12,
-    color: '#666',
+    color: COLORS.TEXT_SECONDARY,
     textAlign: 'center',
+    lineHeight: 18,
   },
 });

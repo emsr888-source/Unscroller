@@ -1,10 +1,10 @@
-# Creator Mode - Setup Status Report
+# Unscroller - Setup Status Report
 
 ## ✅ What's Working
 
 ### Backend (Ready to Use!)
 ```bash
-cd /Users/onalime/CreatorMode/apps/backend
+cd /Users/onalime/Unscroller/apps/backend
 npm run start:dev
 ```
 - ✅ All dependencies installed
@@ -13,7 +13,7 @@ npm run start:dev
 
 ### Desktop App (Ready to Use!)
 ```bash
-cd /Users/onalime/CreatorMode/apps/desktop
+cd /Users/onalime/Unscroller/apps/desktop
 npm run dev
 ```
 - ✅ All dependencies installed
@@ -48,12 +48,12 @@ npm run dev
    ```
 5. Then install pods:
    ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile/ios
+   cd /Users/onalime/Unscroller/apps/mobile/ios
    pod install
    ```
 6. Run the app:
    ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile
+   cd /Users/onalime/Unscroller/apps/mobile
    npm run ios
    ```
 
@@ -64,29 +64,24 @@ If you have an Android phone or want to use Android Emulator:
 2. Set up an Android Virtual Device (AVD) in Android Studio
 3. Run:
    ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile
+   cd /Users/onalime/Unscroller/apps/mobile
    npm run android
    ```
 
-#### Option 3: Test on Physical Phone via Expo (Easiest!)
-You can test on your physical iPhone **without Xcode** using Expo Dev Client:
+#### Option 3: Deploy to a Physical Phone
+Want to see it on a real device? Use the native toolchain:
 
-1. **Install Expo Go** app on your iPhone from App Store
-2. **Start the dev server**:
-   ```bash
-   cd /Users/onalime/CreatorMode/apps/mobile
-   npm start
-   ```
-3. **Scan QR code** with your iPhone camera
-4. App opens in Expo Go!
-
-**Note:** Some native features won't work in Expo Go, but you can test most functionality.
+1. Follow Option 1 (Xcode) or Option 2 (Android Studio) to install the platform tools
+2. Start Metro: `npm run start`
+3. For iOS, open `ios/CreatorMode.xcworkspace` in Xcode and press **Run** on your device
+4. For Android, connect a USB device with debugging enabled and run `npm run android`
+5. Metro will reload changes on your device automatically
 
 ## 🎯 What You Can Do Right Now
 
 ### 1. Start the Backend
 ```bash
-cd /Users/onalime/CreatorMode/apps/backend
+cd /Users/onalime/Unscroller/apps/backend
 
 # Create .env file
 cp .env.example .env
@@ -102,22 +97,22 @@ Backend will run on **http://localhost:3000**
 
 ### 2. Start the Desktop App
 ```bash
-cd /Users/onalime/CreatorMode/apps/desktop
+cd /Users/onalime/Unscroller/apps/desktop
 npm run dev
 ```
 
 Desktop app opens immediately - no additional setup needed!
 
-### 3. Test Mobile with Expo (No Build Required)
+### 3. Test Mobile with Metro
 ```bash
-cd /Users/onalime/CreatorMode/apps/mobile
-npm start
+cd /Users/onalime/Unscroller/apps/mobile
+npm run start
 ```
 
 Then:
-- Scan QR with iPhone Camera (opens in Expo Go if installed)
-- Or press **i** for iOS Simulator (requires Xcode)
-- Or press **a** for Android Emulator (requires Android Studio)
+- Press **i** for iOS Simulator (requires Xcode)
+- Press **a** for Android Emulator (requires Android Studio)
+- Or run `npm run ios` / `npm run android` in another terminal
 
 ## 📋 Complete Setup Checklist
 
@@ -141,34 +136,33 @@ Then:
 - [ ] Set ANDROID_HOME environment variable
 - [ ] Run `npm run android`
 
-### For Expo Testing (Easiest)
+### For Physical Device Testing
 - [x] Dependencies installed
-- [ ] Install Expo Go on phone
-- [ ] Run `npm start`
-- [ ] Scan QR code
+- [ ] Enable developer mode on device
+- [ ] Connect via USB / trusted network
+- [ ] Run `npm run start` and `npm run ios`/`npm run android`
 
 ## 🚀 Quick Start Commands
 
 ```bash
 # Start backend (Terminal 1)
-cd /Users/onalime/CreatorMode/apps/backend
+cd /Users/onalime/Unscroller/apps/backend
 npm run start:dev
 
 # Start desktop (Terminal 2)
-cd /Users/onalime/CreatorMode/apps/desktop
+cd /Users/onalime/Unscroller/apps/desktop
 npm run dev
 
 # Start mobile dev server (Terminal 3)
-cd /Users/onalime/CreatorMode/apps/mobile
+cd /Users/onalime/Unscroller/apps/mobile
 npm start
 ```
 
 ## 📱 Mobile Testing Options
 
-### Without Xcode/Android Studio
-1. **Expo Go** (easiest): Install app, scan QR, test instantly
-2. **Physical device with USB**: Use React Native CLI directly
-3. **Wait for Xcode**: Install later, full native features
+### Without Native Tooling
+1. Use the iOS or Android simulator bundled with teammates (if available)
+2. Focus on desktop/backend until platform tools are installed
 
 ### With Xcode (Mac only)
 1. Install Xcode from App Store
@@ -178,9 +172,8 @@ npm start
 
 ### With Android Studio (Mac/Windows/Linux)
 1. Install Android Studio
-2. Create AVD
+2. Create AVD or connect a device
 3. `npm run android` to build and run
-4. Test on emulator or physical device
 
 ## 🔧 Environment Setup Needed
 
@@ -219,12 +212,11 @@ const BACKEND_URL = 'http://localhost:3000'; // Or your computer's IP for phone 
 4. Build iOS app
 5. Test on simulator/phone
 
-### Path 3: Use Expo Go (Quick Mobile Test)
-1. Install Expo Go on phone
-2. `npm start` in apps/mobile
-3. Scan QR code
-4. Test immediately
-5. Limited to Expo Go features
+### Path 3: Physical Device Build
+1. Enable developer mode on your iOS/Android device
+2. Start Metro: `npm run start`
+3. For iOS run from Xcode, for Android run `npm run android`
+4. Verify policy enforcement directly on hardware
 
 ### Path 4: Android Development
 1. Install Android Studio
@@ -236,13 +228,13 @@ const BACKEND_URL = 'http://localhost:3000'; // Or your computer's IP for phone 
 
 **You're 90% set up!** Backend and Desktop are ready to go right now. Mobile just needs:
 - **Xcode** (for iOS)
-- **OR Android Studio** (for Android)  
-- **OR Expo Go** (for quick testing)
+- **OR Android Studio** (for Android)
+- **OR a teammate/device with the native toolchain already installed**
 
 Pick whichever works best for you!
 
 ---
 
-**Project Location**: `/Users/onalime/CreatorMode/`  
+**Project Location**: `/Users/onalime/Unscroller/`  
 **Status**: ✅ Backend & Desktop Ready | ⚠️ Mobile Needs Xcode/Android Studio  
 **Updated**: October 15, 2025

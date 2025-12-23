@@ -1,14 +1,14 @@
-# Contributing to Creator Mode
+# Contributing to Unscroller
 
-Thank you for your interest in contributing! This document provides guidelines for contributing to Creator Mode.
+Thank you for your interest in contributing! This document provides guidelines for contributing to Unscroller.
 
 ## Getting Started
 
 1. **Fork the repository**
 2. **Clone your fork**:
    ```bash
-   git clone https://github.com/your-username/creator-mode.git
-   cd creator-mode
+   git clone https://github.com/your-username/unscroller.git
+   cd unscroller
    ```
 3. **Install dependencies**:
    ```bash
@@ -178,4 +178,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-**Thank you for contributing to Creator Mode!** 🙏
+**Thank you for contributing to Unscroller!** 🙏

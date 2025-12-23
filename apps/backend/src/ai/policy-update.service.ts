@@ -51,7 +51,7 @@ export class PolicyUpdateService {
       const policy = JSON.parse(fs.readFileSync(this.policyPath, 'utf8'));
 
       if (dryRun) {
-        this.logger.log('DRY RUN - Would apply update:', update);
+        this.logger.log(`DRY RUN - Would apply update: ${JSON.stringify(update)}`);
         return true;
       }
 
@@ -275,7 +275,7 @@ export class PolicyUpdateService {
     const startUrls: Record<string, string> = {
       instagram: 'https://www.instagram.com/direct/inbox/',
       youtube: 'https://www.youtube.com/feed/subscriptions',
-      tiktok: 'https://www.tiktok.com/upload',
+      tiktok: 'https://www.tiktok.com/tiktokstudio/upload?from=webapp',
       facebook: 'https://m.facebook.com/messages/',
       snapchat: 'https://web.snapchat.com/'
     };

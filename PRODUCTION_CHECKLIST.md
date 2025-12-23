@@ -1,6 +1,6 @@
 # Production Deployment Checklist
 
-Complete this checklist before launching Creator Mode to production.
+Complete this checklist before launching Unscroller to production.
 
 ## 🔐 Security
 
@@ -57,7 +57,7 @@ Complete this checklist before launching Creator Mode to production.
 ## 📱 Mobile Apps
 
 ### iOS
-- [ ] Configure bundle ID: `com.creatormode.app`
+- [ ] Configure bundle ID: `com.unscroller.app`
 - [ ] Set up App Store Connect app listing
 - [ ] Create screenshots (6.7", 6.5", 5.5" displays)
 - [ ] Write App Store description (see README for copy)
@@ -72,7 +72,7 @@ Complete this checklist before launching Creator Mode to production.
 - [ ] Submit for App Review
 
 ### Android
-- [ ] Configure applicationId: `com.creatormode.app`
+- [ ] Configure applicationId: `com.unscroller.app`
 - [ ] Set up Play Console app listing
 - [ ] Create screenshots (phone, tablet)
 - [ ] Write Play Store description
@@ -147,7 +147,7 @@ POLICY_PRIVATE_KEY_PATH=/secure/path/policy-private.pem
 ```
 
 ### Webhooks
-- [ ] Configure Stripe webhook endpoint: `https://api.creatormode.com/api/webhooks/stripe`
+- [ ] Configure Stripe webhook endpoint: `https://api.unscroller.com/api/webhooks/stripe`
 - [ ] Test webhook delivery
 - [ ] Set up retry logic for failed webhooks
 
@@ -185,7 +185,7 @@ POLICY_PRIVATE_KEY_PATH=/secure/path/policy-private.pem
 - [ ] Add privacy policy
 - [ ] Add terms of service
 - [ ] Add support/contact page
-- [ ] Set up custom domain: `creatormode.com`
+- [ ] Set up custom domain: `unscroller.com`
 - [ ] Enable HTTPS
 
 ### App Store Optimization (ASO)

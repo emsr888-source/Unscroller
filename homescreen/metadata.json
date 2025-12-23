@@ -1,0 +1,8 @@
+{
+  "name": "UNSCROLLER",
+  "description": "A watercolor-style digital wellbeing tracker featuring an AI Buddy powered by Gemini Nano Banana.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
