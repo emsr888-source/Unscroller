@@ -16,13 +16,18 @@ dist
 .DS_Store
 *.pem
 .env*.local
+.env
+apps/backend/.env
+apps/mobile/.env
+apps/backend/.env*
+apps/mobile/.env*
+.env.*
 .vscode
 .expo/
+mobile/ios/Pods
 
 # Mobile
 apps/mobile/android/app/build
-apps/mobile/ios/build
-apps/mobile/ios/Pods
 
 # Desktop
 apps/desktop/out

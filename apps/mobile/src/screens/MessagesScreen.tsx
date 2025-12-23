@@ -20,11 +20,13 @@ import WatercolorBackdrop from '@/components/watercolor/WatercolorBackdrop';
 import WatercolorCard from '@/components/watercolor/WatercolorCard';
 import WatercolorButton from '@/components/watercolor/WatercolorButton';
 import {
-  fetchFriends,
   fetchThreads,
+  BuddyListItem,
+  BuddyRequestsResponse,
   MessageThread,
   ProfilePreview,
 } from '@/services/messageService';
+import buddyService from '@/services/buddyService';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Messages'>;
 const formatRelativeTime = (isoDate: string) => {
@@ -52,8 +54,11 @@ export default function MessagesScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [friendsVisible, setFriendsVisible] = useState(false);
-  const [friendsLoading, setFriendsLoading] = useState(false);
-  const [friends, setFriends] = useState<ProfilePreview[]>([]);
+  const [buddiesLoading, setBuddiesLoading] = useState(false);
+  const [buddyRequestsLoading, setBuddyRequestsLoading] = useState(false);
+  const [buddies, setBuddies] = useState<BuddyListItem[]>([]);
+  const [buddyRequests, setBuddyRequests] = useState<BuddyRequestsResponse | null>(null);
+  const [requestActionId, setRequestActionId] = useState<string | null>(null);
 
   const loadThreads = useCallback(async () => {
     try {
@@ -67,22 +72,54 @@ export default function MessagesScreen({ navigation }: Props) {
     }
   }, []);
 
-  const loadFriends = useCallback(async () => {
-    setFriendsLoading(true);
+  const loadBuddies = useCallback(
+    async (force = false) => {
+      setBuddiesLoading(true);
+      try {
+        const list = await buddyService.listBuddies({ force });
+        setBuddies(list);
+      } catch (error) {
+        Alert.alert('Unable to load buddies', error instanceof Error ? error.message : 'Try again later.');
+      } finally {
+        setBuddiesLoading(false);
+      }
+    },
+    [],
+  );
+
+  const loadBuddyRequests = useCallback(async () => {
+    setBuddyRequestsLoading(true);
     try {
-      const data = await fetchFriends();
-      setFriends(data);
+      const requests = await buddyService.getBuddyRequests();
+      setBuddyRequests(requests);
     } catch (error) {
-      Alert.alert('Unable to load friends', error instanceof Error ? error.message : 'Try again later.');
+      Alert.alert('Unable to load buddy requests', error instanceof Error ? error.message : 'Try again later.');
     } finally {
-      setFriendsLoading(false);
+      setBuddyRequestsLoading(false);
     }
   }, []);
+
+  const handleBuddyRequestAction = useCallback(
+    async (requestId: string, action: 'accept' | 'decline') => {
+      setRequestActionId(requestId);
+      try {
+        await buddyService.respondToRequest(requestId, action);
+        await Promise.all([loadBuddyRequests(), loadBuddies(true)]);
+      } catch (error) {
+        Alert.alert('Unable to update request', error instanceof Error ? error.message : 'Try again later.');
+      } finally {
+        setRequestActionId(null);
+      }
+    },
+    [loadBuddyRequests, loadBuddies],
+  );
 
   useFocusEffect(
     useCallback(() => {
       loadThreads();
-    }, [loadThreads]),
+      loadBuddies(true);
+      loadBuddyRequests();
+    }, [loadThreads, loadBuddies, loadBuddyRequests]),
   );
 
   const handleRefresh = () => {
@@ -105,18 +142,87 @@ export default function MessagesScreen({ navigation }: Props) {
 
   const openCompose = () => {
     setFriendsVisible(true);
-    if (friends.length === 0) {
-      loadFriends();
+    if (!buddies.length) {
+      loadBuddies();
     }
   };
 
-  const selectFriend = (friend: ProfilePreview) => {
+  const selectBuddy = (buddyEntry: BuddyListItem) => {
     setFriendsVisible(false);
     navigation.navigate('DirectMessageThread', {
-      partnerId: friend.id,
-      partnerName: getDisplayName(friend),
-      avatar: friend.avatar_url || null,
+      partnerId: buddyEntry.buddy.id,
+      partnerName: getDisplayName(buddyEntry.buddy),
+      avatar: buddyEntry.buddy.avatar_url || null,
     });
+  };
+
+  const renderBuddyRequestCard = () => {
+    if (buddyRequestsLoading && !buddyRequests) {
+      return (
+        <WatercolorCard style={styles.requestCard} backgroundColor="#fff">
+          <ActivityIndicator color="#0ea5e9" />
+        </WatercolorCard>
+      );
+    }
+    if (
+      !buddyRequests ||
+      (buddyRequests.incoming.length === 0 && buddyRequests.outgoing.length === 0)
+    ) {
+      return null;
+    }
+
+    const formatRequestName = (preview: ProfilePreview) =>
+      preview.full_name || preview.username || 'Creator';
+
+    return (
+      <WatercolorCard style={styles.requestCard} backgroundColor="#fff">
+        <Text style={styles.requestTitle}>Buddy requests</Text>
+        {buddyRequests.incoming.length ? (
+          <View style={styles.requestSection}>
+            <Text style={styles.requestSectionLabel}>Incoming</Text>
+            {buddyRequests.incoming.map(request => (
+              <View key={request.id} style={styles.requestRow}>
+                <View style={styles.requestInfo}>
+                  <Text style={styles.friendName}>{formatRequestName(request.from_user)}</Text>
+                  <Text style={styles.friendHandle}>
+                    Sent {new Date(request.created_at).toLocaleDateString()}
+                  </Text>
+                </View>
+                <View style={styles.requestButtons}>
+                  <TouchableOpacity
+                    style={[styles.requestButton, styles.acceptButton]}
+                    onPress={() => handleBuddyRequestAction(request.id, 'accept')}
+                    disabled={requestActionId === request.id}
+                  >
+                    <Text style={styles.requestButtonText}>Accept</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.requestButton, styles.declineButton]}
+                    onPress={() => handleBuddyRequestAction(request.id, 'decline')}
+                    disabled={requestActionId === request.id}
+                  >
+                    <Text style={styles.requestButtonText}>Decline</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </View>
+        ) : null}
+        {buddyRequests.outgoing.length ? (
+          <View style={styles.requestSection}>
+            <Text style={styles.requestSectionLabel}>Outgoing</Text>
+            {buddyRequests.outgoing.map(request => (
+              <View key={request.id} style={styles.requestRow}>
+                <View style={styles.requestInfo}>
+                  <Text style={styles.friendName}>{formatRequestName(request.to_user)}</Text>
+                  <Text style={styles.friendHandle}>Pending acceptance</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        ) : null}
+      </WatercolorCard>
+    );
   };
 
   const threadContent = useMemo(() => {
@@ -190,6 +296,7 @@ export default function MessagesScreen({ navigation }: Props) {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#1f2937" />}
           showsVerticalScrollIndicator={false}
         >
+          {renderBuddyRequestCard()}
           {threadContent}
           <View style={styles.bottomSpacing} />
         </ScrollView>
@@ -199,20 +306,20 @@ export default function MessagesScreen({ navigation }: Props) {
         <View style={styles.modalOverlay}>
           <WatercolorCard style={styles.modalContent} backgroundColor="#fff">
             <Text style={styles.modalTitle}>Start a new chat</Text>
-            {friendsLoading ? (
+            {buddiesLoading ? (
               <ActivityIndicator color="#fb7185" />
-            ) : friends.length === 0 ? (
-              <Text style={styles.emptySubtitle}>No friends yet. Pair up in the Collaboration Hub!</Text>
+            ) : buddies.length === 0 ? (
+              <Text style={styles.emptySubtitle}>No buddies yet. Pair up in the Collaboration Hub!</Text>
             ) : (
               <ScrollView style={styles.friendsList} showsVerticalScrollIndicator={false}>
-                {friends.map(friend => (
-                  <TouchableOpacity key={friend.id} style={styles.friendRow} onPress={() => selectFriend(friend)}>
+                {buddies.map(entry => (
+                  <TouchableOpacity key={entry.pairId} style={styles.friendRow} onPress={() => selectBuddy(entry)}>
                     <View style={styles.avatarBubbleSmall}>
-                      <Text style={styles.avatarText}>{getAvatarLabel(friend)}</Text>
+                      <Text style={styles.avatarText}>{getAvatarLabel(entry.buddy)}</Text>
                     </View>
                     <View style={styles.friendInfo}>
-                      <Text style={styles.friendName}>{getDisplayName(friend)}</Text>
-                      {friend.username ? <Text style={styles.friendHandle}>@{friend.username}</Text> : null}
+                      <Text style={styles.friendName}>{getDisplayName(entry.buddy)}</Text>
+                      {entry.buddy.username ? <Text style={styles.friendHandle}>@{entry.buddy.username}</Text> : null}
                     </View>
                   </TouchableOpacity>
                 ))}
@@ -425,6 +532,52 @@ const styles = StyleSheet.create({
   cancelText: {
     fontFamily: 'PatrickHand-Regular',
     fontSize: 16,
+    color: '#1f2937',
+  },
+  requestCard: {
+    gap: SPACING.space_2,
+  },
+  requestTitle: {
+    fontFamily: 'PatrickHand-Regular',
+    fontSize: 20,
+    color: '#1f2937',
+  },
+  requestSection: {
+    gap: SPACING.space_2,
+  },
+  requestSectionLabel: {
+    fontFamily: 'PatrickHand-Regular',
+    fontSize: 16,
+    color: '#475569',
+  },
+  requestRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: SPACING.space_2,
+  },
+  requestInfo: {
+    flex: 1,
+  },
+  requestButtons: {
+    flexDirection: 'row',
+    gap: SPACING.space_2,
+  },
+  requestButton: {
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingHorizontal: SPACING.space_2,
+    paddingVertical: 4,
+  },
+  acceptButton: {
+    borderColor: '#16a34a',
+  },
+  declineButton: {
+    borderColor: '#f87171',
+  },
+  requestButtonText: {
+    fontFamily: 'PatrickHand-Regular',
+    fontSize: 14,
     color: '#1f2937',
   },
 });

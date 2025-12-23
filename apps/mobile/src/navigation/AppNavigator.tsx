@@ -85,6 +85,7 @@ import DirectMessageThreadScreen from '../screens/DirectMessageThreadScreen';
 import BuildProjectThreadScreen from '../screens/BuildProjectThreadScreen';
 import BuildUpdateThreadScreen from '../screens/BuildUpdateThreadScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
+import UserContentListScreen from '../screens/UserContentListScreen';
 import ResourcesScreen from '../screens/ResourcesScreen';
 import GoalsScreen from '../screens/GoalsScreen';
 import BlockingPermissionsScreen from '../screens/BlockingPermissionsScreen';
@@ -496,6 +497,7 @@ export default function AppNavigator() {
             <Stack.Screen name="ManifestSession" component={ManifestSessionScreen} />
             <Stack.Screen name="Messages" component={MessagesScreen} />
             <Stack.Screen name="DirectMessageThread" component={DirectMessageThreadScreen} />
+            <Stack.Screen name="UserContentList" component={UserContentListScreen} />
             <Stack.Screen name="BuildProjectThread" component={BuildProjectThreadScreen} />
             <Stack.Screen name="BuildUpdateThread" component={BuildUpdateThreadScreen} />
             <Stack.Screen name="UserProfile" component={UserProfileScreen} />

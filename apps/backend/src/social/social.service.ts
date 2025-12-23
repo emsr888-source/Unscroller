@@ -18,6 +18,90 @@ type DirectMessageRecord = {
   created_at: string;
 };
 
+type CommunityPostSummary = {
+  id: string;
+  content: string;
+  image_url?: string | null;
+  likes_count?: number | null;
+  comments_count?: number | null;
+  created_at: string;
+};
+
+type PartnershipPostSummary = {
+  id: string;
+  headline: string;
+  project_summary: string;
+  updated_at: string;
+  status: string;
+  applications_count?: number | null;
+  creator?: ProfilePreview | null;
+};
+
+type PartnershipPostRow = Omit<PartnershipPostSummary, 'creator'> & {
+  creator?: ProfilePreview | ProfilePreview[] | null;
+};
+
+type ChallengeBrief = {
+  id: string;
+  title: string;
+  description: string;
+  cover_emoji?: string | null;
+  metric: string;
+  target: number;
+  start_date: string;
+  end_date: string;
+};
+
+type ChallengeCreatedSummary = ChallengeBrief & {
+  created_at: string;
+};
+
+type ChallengeParticipationSummary = {
+  id: string;
+  current_progress: number;
+  completed: boolean;
+  joined_at: string;
+  challenge: ChallengeBrief;
+};
+
+type BuildProjectBrief = {
+  id: string;
+  title: string;
+};
+
+type BuildUpdateSummary = {
+  id: string;
+  project_id: string;
+  content: string;
+  milestone?: string | null;
+  created_at: string;
+  progress_percent?: number | null;
+  project: BuildProjectBrief;
+};
+
+type ChallengeParticipationRow = Omit<ChallengeParticipationSummary, 'challenge'> & {
+  challenge: ChallengeBrief | ChallengeBrief[] | null;
+};
+
+type BuildUpdateRow = Omit<BuildUpdateSummary, 'project'> & {
+  project: BuildProjectBrief | BuildProjectBrief[] | null;
+};
+
+type HubCollections = {
+  communityPosts: CommunityPostSummary[];
+  challengesCreated: ChallengeCreatedSummary[];
+  challengesJoined: ChallengeParticipationSummary[];
+  buildUpdates: BuildUpdateSummary[];
+};
+
+type LatestContentBlocks = {
+  community: CommunityPostSummary | null;
+  partnership: PartnershipPostSummary | null;
+  challengesCreated: ChallengeCreatedSummary | null;
+  challengesJoined: ChallengeParticipationSummary | null;
+  build: BuildUpdateSummary | null;
+};
+
 @Injectable()
 export class SocialService {
   private supabase: SupabaseClient | null = null;
@@ -29,6 +113,13 @@ export class SocialService {
     if (supabaseUrl && supabaseKey) {
       this.supabase = createClient(supabaseUrl, supabaseKey);
     }
+  }
+
+  private extractSingle<T>(value: T | T[] | null | undefined): T | null {
+    if (Array.isArray(value)) {
+      return value[0] ?? null;
+    }
+    return value ?? null;
   }
 
   private requireClient() {
@@ -322,43 +413,259 @@ export class SocialService {
 
     if (profileError) throw profileError;
 
-    private async getHubCollections(userId: string, supabase: SupabaseClient) {
+    const [{ count: followersCount, error: followersError }, { count: followingCount, error: followingError }] = await Promise.all([
+      supabase
+        .from('user_follows')
+        .select('*', { head: true, count: 'exact' })
+        .eq('following_id', targetUserId),
+      supabase
+        .from('user_follows')
+        .select('*', { head: true, count: 'exact' })
+        .eq('follower_id', targetUserId),
+    ]);
+
+    if (followersError) throw followersError;
+    if (followingError) throw followingError;
+
+    const [{ data: isFollowingRow }, { data: isFollowerRow }] = await Promise.all([
+      supabase
+        .from('user_follows')
+        .select('id')
+        .eq('follower_id', viewerId)
+        .eq('following_id', targetUserId)
+        .maybeSingle(),
+      supabase
+        .from('user_follows')
+        .select('id')
+        .eq('follower_id', targetUserId)
+        .eq('following_id', viewerId)
+        .maybeSingle(),
+    ]);
+
+    const buddySummary = await this.getBuddySummary(viewerId, targetUserId);
+    const buddyCount = await this.getBuddyCount(targetUserId, supabase);
+    const hubCollections = await this.getHubCollections(targetUserId, supabase);
+
+    const { data: partnershipRowsRaw, error: partnershipsError } = await supabase
+      .from('partnership_posts')
+      .select(`
+        id,
+        headline,
+        project_summary,
+        status,
+        applications_count,
+        updated_at,
+        creator:creator_id (
+          id,
+          full_name,
+          username,
+          avatar_url
+        )
+      `)
+      .eq('creator_id', targetUserId)
+      .order('updated_at', { ascending: false })
+      .limit(10);
+
+    if (partnershipsError) throw partnershipsError;
+
+    const { data: buildProjects, error: projectsError } = await supabase
+      .from('build_projects')
+      .select(`
+        id,
+        title,
+        summary,
+        goal,
+        tags,
+        followers_count,
+        created_at,
+        owner:owner_id (
+          id,
+          full_name,
+          username,
+          avatar_url
+        ),
+        updates:build_updates (
+          id,
+          content,
+          created_at,
+          progress_percent,
+          milestone,
+          author:author_id (
+            id,
+            full_name,
+            username,
+            avatar_url
+          )
+        )
+      `)
+      .eq('owner_id', targetUserId)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (projectsError) throw projectsError;
+
+    const partnershipRows = (partnershipRowsRaw as PartnershipPostRow[] | null) ?? [];
+    const partnershipSummaries: PartnershipPostSummary[] = [];
+    for (const row of partnershipRows) {
+      const creator = this.extractSingle(row.creator);
+      if (!creator) continue;
+      partnershipSummaries.push({
+        ...row,
+        creator,
+      });
+    }
+    const latestContent = this.buildLatestContentBlocks({
+      communityPosts: hubCollections.communityPosts,
+      partnershipPosts: partnershipSummaries,
+      challengesCreated: hubCollections.challengesCreated,
+      challengesJoined: hubCollections.challengesJoined,
+      buildUpdates: hubCollections.buildUpdates,
+    });
+
+    return {
+      profile,
+      stats: {
+        followers: followersCount ?? 0,
+        following: followingCount ?? 0,
+        buddies: buddyCount,
+      },
+      relationships: {
+        isSelf: viewerId === targetUserId,
+        isFollowing: Boolean(isFollowingRow),
+        isFollowedBy: Boolean(isFollowerRow),
+        ...buddySummary.relationships,
+      },
+      buddy: buddySummary.buddy,
+      latestContent,
+      hubCollections,
+      partnershipPosts: partnershipSummaries,
+      buildProjects: buildProjects || [],
+    };
+  }
+
+  private buildLatestContentBlocks({
+    communityPosts,
+    partnershipPosts,
+    challengesCreated,
+    challengesJoined,
+    buildUpdates,
+  }: {
+    communityPosts: CommunityPostSummary[];
+    partnershipPosts: PartnershipPostSummary[];
+    challengesCreated: ChallengeCreatedSummary[];
+    challengesJoined: ChallengeParticipationSummary[];
+    buildUpdates: BuildUpdateSummary[];
+  }): LatestContentBlocks {
+    return {
+      community: communityPosts[0] ?? null,
+      partnership: partnershipPosts[0] ?? null,
+      challengesCreated: challengesCreated[0] ?? null,
+      challengesJoined: challengesJoined[0] ?? null,
+      build: buildUpdates[0] ?? null,
+    };
+  }
+
+  private async getHubCollections(userId: string, supabase: SupabaseClient): Promise<HubCollections> {
     const [communityPostsResp, createdChallengesResp, joinedChallengesResp, buildUpdatesResp] = await Promise.all([
       supabase
         .from('community_posts')
         .select('id, content, image_url, likes_count, comments_count, created_at')
-        .eq('following_id', userId),
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20),
       supabase
         .from('challenges')
         .select('id, title, description, cover_emoji, metric, target, start_date, end_date, created_at')
         .eq('creator_id', userId)
         .order('created_at', { ascending: false })
-        .limit(10),
+        .limit(20),
       supabase
-        .from('challenge_participants')
-        .select('challenge_id, current_progress, completed, joined_at')
+        .from('user_challenges')
+        .select(`
+          id,
+          current_progress,
+          completed,
+          joined_at,
+          challenge:challenges (
+            id,
+            title,
+            description,
+            cover_emoji,
+            metric,
+            target,
+            start_date,
+            end_date
+          )
+        `)
         .eq('user_id', userId)
         .order('joined_at', { ascending: false })
-        .limit(10),
+        .limit(20),
       supabase
         .from('build_updates')
-        .select('id, project_id, content, milestone, created_at, progress_percent')
+        .select(`
+          id,
+          project_id,
+          content,
+          milestone,
+          created_at,
+          progress_percent,
+          project:build_projects (
+            id,
+            title
+          )
+        `)
         .eq('author_id', userId)
         .order('created_at', { ascending: false })
-        .limit(10),
+        .limit(20),
     ]);
 
+    const communityPosts = (communityPostsResp?.data as CommunityPostSummary[]) || [];
+    const challengesCreated = (createdChallengesResp?.data as ChallengeCreatedSummary[]) || [];
+
+    const challengeRows = (joinedChallengesResp?.data as ChallengeParticipationRow[] | null) ?? [];
+    const challengesJoined: ChallengeParticipationSummary[] = challengeRows.flatMap(row => {
+      const challenge = this.extractSingle(row.challenge);
+      if (!challenge) return [];
+      return [
+        {
+          ...row,
+          challenge,
+        },
+      ];
+    });
+
+    const buildRows = (buildUpdatesResp?.data as BuildUpdateRow[] | null) ?? [];
+    const buildUpdates: BuildUpdateSummary[] = buildRows.flatMap(row => {
+      const project = this.extractSingle(row.project);
+      if (!project) return [];
+      return [
+        {
+          ...row,
+          project,
+        },
+      ];
+    });
+
     return {
-      communityPosts: communityPostsResp?.data || [],
-      challengesCreated: createdChallengesResp?.data || [],
-      challengesJoined: joinedChallengesResp?.data || [],
-      buildUpdates: buildUpdatesResp?.data || [],
+      communityPosts,
+      challengesCreated,
+      challengesJoined,
+      buildUpdates,
     };
+  }
+
+  private async getBuddyCount(userId: string, supabase: SupabaseClient) {
+    const { count } = await supabase
+      .from('buddy_pairs')
+      .select('*', { head: true, count: 'exact' })
+      .eq('status', 'active')
+      .or(`user_id_1.eq.${userId},user_id_2.eq.${userId}`);
+
+    return count ?? 0;
   }
 
   async updateFocusGoal(userId: string, focusGoal: string | null) {
     const supabase = this.requireClient();
-
     const { data, error } = await supabase
       .from('profiles')
       .update({ focus_goal: focusGoal ?? null })
@@ -626,6 +933,8 @@ export class SocialService {
         relationships: {
           isBuddy: true,
           buddyRequestStatus: 'accepted',
+          buddyRequestDirection: null,
+          buddyRequestId: null,
         },
         buddy: buddyProfile,
       };
@@ -640,11 +949,19 @@ export class SocialService {
       .maybeSingle();
 
     const buddyRequestStatus = pendingRequest?.status ?? null;
+    const buddyRequestDirection = pendingRequest
+      ? pendingRequest.from_user_id === viewerId
+        ? 'outgoing'
+        : 'incoming'
+      : null;
+    const buddyRequestId = pendingRequest?.id ?? null;
 
     return {
       relationships: {
         isBuddy: false,
         buddyRequestStatus,
+        buddyRequestDirection,
+        buddyRequestId,
       },
       buddy: null,
     };

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Put, Body, Param, Query, Headers } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Headers, Param, Post, Put, Query } from '@nestjs/common';
 import { SocialService } from './social.service';
 
 @Controller('social')
@@ -36,6 +36,15 @@ export class SocialController {
   ) {
     const userId = this.extractUserId(auth);
     return this.socialService.updateAvatar(userId, body.image_base64, body.mime_type);
+  }
+
+  @Put('profiles/focus-goal')
+  async updateFocusGoal(
+    @Headers('authorization') auth: string,
+    @Body() body: { focus_goal?: string | null },
+  ) {
+    const userId = this.extractUserId(auth);
+    return this.socialService.updateFocusGoal(userId, body.focus_goal ?? null);
   }
 
   @Delete('follow/:userId')
@@ -112,6 +121,41 @@ export class SocialController {
   async markAllNotificationsAsRead(@Headers('authorization') auth: string) {
     const userId = this.extractUserId(auth);
     return this.socialService.markAllNotificationsAsRead(userId);
+  }
+
+  @Get('buddies')
+  async getBuddies(@Headers('authorization') auth: string) {
+    const userId = this.extractUserId(auth);
+    return this.socialService.getBuddies(userId);
+  }
+
+  @Get('buddies/requests')
+  async getBuddyRequests(@Headers('authorization') auth: string) {
+    const userId = this.extractUserId(auth);
+    return this.socialService.getBuddyRequests(userId);
+  }
+
+  @Post('buddies/:userId/request')
+  async sendBuddyRequest(
+    @Headers('authorization') auth: string,
+    @Param('userId') targetUserId: string,
+    @Body() body: { message?: string },
+  ) {
+    const userId = this.extractUserId(auth);
+    return this.socialService.sendBuddyRequest(userId, targetUserId, body?.message);
+  }
+
+  @Post('buddies/requests/:requestId/respond')
+  async respondToBuddyRequest(
+    @Headers('authorization') auth: string,
+    @Param('requestId') requestId: string,
+    @Body() body: { action: 'accept' | 'decline' },
+  ) {
+    const userId = this.extractUserId(auth);
+    if (!body?.action || !['accept', 'decline'].includes(body.action)) {
+      throw new BadRequestException('Invalid action. Use "accept" or "decline".');
+    }
+    return this.socialService.respondToBuddyRequest(userId, requestId, body.action);
   }
 
   private extractUserId(auth: string): string {

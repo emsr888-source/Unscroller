@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -21,20 +21,19 @@ import { PrimaryButton } from '@/features/onboarding/components/PrimaryButton';
 import {
   followUser,
   getUserProfile,
+  respondToBuddyRequest,
+  sendBuddyRequest,
   unfollowUser,
   uploadAvatar,
   UserProfileResponse,
 } from '@/services/messageService';
 import { RootStackParamList } from '@/navigation/AppNavigator';
+import WatercolorCard from '@/components/watercolor/WatercolorCard';
+import { ProfileHubSections, buildProfileSections, HubSectionViewModel } from '@/screens/profile/ProfileHubSections';
 
 const AVATAR_SIZE = 96;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'UserProfile'>;
-
-const formatDate = (isoDate: string) => {
-  const date = new Date(isoDate);
-  return date.toLocaleDateString();
-};
 
 const UserProfileScreen: React.FC<Props> = ({ navigation, route }) => {
   const { userId } = route.params;
@@ -42,11 +41,14 @@ const UserProfileScreen: React.FC<Props> = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [hubSections, setHubSections] = useState<HubSectionViewModel[]>([]);
+  const [buddyActionLoading, setBuddyActionLoading] = useState(false);
 
   const loadProfile = useCallback(async () => {
     try {
       const data = await getUserProfile(userId);
       setProfile(data);
+      setHubSections(buildProfileSections(data));
     } catch (error) {
       Alert.alert('Unable to load profile', error instanceof Error ? error.message : 'Please try again.');
     } finally {
@@ -80,11 +82,41 @@ const UserProfileScreen: React.FC<Props> = ({ navigation, route }) => {
 
   const handleMessage = () => {
     if (!profile) return;
+    if (!profile.relationships.isBuddy) {
+      Alert.alert('Buddies only', 'You can only message people who have accepted your buddy request.');
+      return;
+    }
     navigation.navigate('DirectMessageThread', {
       partnerId: profile.profile.id,
       partnerName: profile.profile.full_name || profile.profile.username || 'Creator',
       avatar: profile.profile.avatar_url || null,
     });
+  };
+
+  const handleSendBuddyRequest = async () => {
+    if (!profile) return;
+    setBuddyActionLoading(true);
+    try {
+      await sendBuddyRequest(profile.profile.id);
+      await loadProfile();
+    } catch (error) {
+      Alert.alert('Unable to send request', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setBuddyActionLoading(false);
+    }
+  };
+
+  const handleRespondToBuddyRequest = async (action: 'accept' | 'decline') => {
+    if (!profile?.relationships.buddyRequestId) return;
+    setBuddyActionLoading(true);
+    try {
+      await respondToBuddyRequest(profile.relationships.buddyRequestId, action);
+      await loadProfile();
+    } catch (error) {
+      Alert.alert('Unable to update request', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setBuddyActionLoading(false);
+    }
   };
 
   const handleChangeAvatar = async () => {
@@ -110,27 +142,10 @@ const UserProfileScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
-  const posts = useMemo(() => {
-    if (!profile) return [];
-    return [
-      ...profile.partnershipPosts.map(post => ({
-        id: `partner-${post.id}`,
-        type: 'partnership' as const,
-        title: post.headline,
-        subtitle: post.project_summary,
-        timestamp: post.updated_at,
-        meta: `${post.applications_count} applicants`,
-      })),
-      ...profile.buildProjects.map(project => ({
-        id: `build-${project.id}`,
-        type: 'build' as const,
-        title: project.title,
-        subtitle: project.summary,
-        timestamp: project.created_at,
-        meta: `${project.followers_count} followers`,
-      })),
-    ];
-  }, [profile]);
+  const focusGoal = profile?.profile.focus_goal?.trim();
+  const buddyRequestStatus = profile?.relationships.buddyRequestStatus;
+  const buddyRequestDirection = profile?.relationships.buddyRequestDirection;
+  const canMessage = profile?.relationships.isBuddy;
 
   if (loading && !profile) {
     return (
@@ -153,7 +168,7 @@ const UserProfileScreen: React.FC<Props> = ({ navigation, route }) => {
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
 
-        <View style={styles.headerCard}>
+        <WatercolorCard style={styles.headerCard} backgroundColor={COLORS.BACKGROUND_ELEVATED}>
           <TouchableOpacity style={styles.avatarWrapper} onPress={handleChangeAvatar} disabled={!profile?.relationships.isSelf}>
             {profile?.profile.avatar_url ? (
               <Image source={{ uri: profile.profile.avatar_url }} style={styles.avatar} />
@@ -185,55 +200,79 @@ const UserProfileScreen: React.FC<Props> = ({ navigation, route }) => {
               <Text style={styles.statValue}>{profile?.stats.following ?? 0}</Text>
               <Text style={styles.statLabel}>Following</Text>
             </View>
+            <View style={styles.statCol}>
+              <Text style={styles.statValue}>{profile?.stats.buddies ?? 0}</Text>
+              <Text style={styles.statLabel}>Buddies</Text>
+            </View>
           </View>
 
-          <View style={styles.actionsRow}>
-            {!profile?.relationships.isSelf ? (
+          {!profile?.relationships.isSelf ? (
+            <View style={styles.actionsRow}>
               <PrimaryButton
                 style={styles.actionButton}
                 title={profile?.relationships.isFollowing ? 'Following' : 'Follow'}
                 onPress={handleFollowToggle}
               />
-            ) : null}
-            {!profile?.relationships.isSelf ? (
-              <TouchableOpacity style={styles.secondaryAction} onPress={handleMessage}>
-                <Text style={styles.secondaryActionText}>Message</Text>
+              <TouchableOpacity
+                style={[styles.secondaryAction, !canMessage && styles.secondaryActionDisabled]}
+                onPress={handleMessage}
+                disabled={!canMessage}
+              >
+                <Text style={[styles.secondaryActionText, !canMessage && styles.secondaryActionTextDisabled]}>
+                  {canMessage ? 'Message' : 'Buddies only'}
+                </Text>
               </TouchableOpacity>
-            ) : null}
-          </View>
-        </View>
+            </View>
+          ) : null}
+        </WatercolorCard>
 
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Posts & Builds</Text>
-          <Text style={styles.sectionSubtitle}>Tap a card to view the thread.</Text>
-        </View>
+        {focusGoal ? (
+          <WatercolorCard style={styles.focusCard} backgroundColor="#fff">
+            <Text style={styles.sectionTitle}>30-day focus</Text>
+            <Text style={styles.focusText}>{focusGoal}</Text>
+          </WatercolorCard>
+        ) : null}
 
-        {posts.length === 0 ? (
-          <Text style={styles.emptyText}>Nothing shared yet.</Text>
-        ) : (
-          posts.map(item => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.postCard}
-              activeOpacity={0.85}
-              onPress={() =>
-                item.type === 'build'
-                  ? navigation.navigate('BuildProjectThread', {
-                      projectId: item.id.replace('build-', ''),
-                    })
-                  : navigation.navigate('CollaborationHub', { initialTab: 'partnerships' })
-              }
-            >
-              <Text style={styles.postType}>{item.type === 'build' ? 'Build in Public' : 'Partnership'}</Text>
-              <Text style={styles.postTitle}>{item.title}</Text>
-              <Text style={styles.postSubtitle}>{item.subtitle}</Text>
-              <View style={styles.postFooter}>
-                <Text style={styles.postMeta}>{item.meta}</Text>
-                <Text style={styles.postTimestamp}>{formatDate(item.timestamp)}</Text>
-              </View>
-            </TouchableOpacity>
-          ))
-        )}
+        {!profile?.relationships.isSelf ? (
+          <WatercolorCard style={styles.buddyCard} backgroundColor="#fff">
+            <Text style={styles.sectionTitle}>Buddy status</Text>
+            {profile?.relationships.isBuddy ? (
+              <Text style={styles.buddyStatusText}>🌟 You’re buddies. Keep each other accountable!</Text>
+            ) : buddyRequestStatus === 'pending' ? (
+              buddyRequestDirection === 'incoming' ? (
+                <View style={styles.buddyActionsRow}>
+                  <Text style={styles.buddyStatusText}>This user wants to buddy up.</Text>
+                  <View style={styles.buddyButtons}>
+                    <TouchableOpacity
+                      style={[styles.secondaryAction, styles.acceptButton]}
+                      onPress={() => handleRespondToBuddyRequest('accept')}
+                      disabled={buddyActionLoading}
+                    >
+                      <Text style={styles.secondaryActionText}>Accept</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.secondaryAction, styles.declineButton]}
+                      onPress={() => handleRespondToBuddyRequest('decline')}
+                      disabled={buddyActionLoading}
+                    >
+                      <Text style={styles.secondaryActionText}>Decline</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <Text style={styles.buddyStatusText}>Request sent. Waiting for them to accept.</Text>
+              )
+            ) : (
+              <PrimaryButton
+                title={buddyActionLoading ? 'Sending…' : 'Send buddy request'}
+                onPress={handleSendBuddyRequest}
+                disabled={buddyActionLoading}
+              />
+            )}
+          </WatercolorCard>
+        ) : null}
+
+        {hubSections.length ? <ProfileHubSections sections={hubSections} navigation={navigation} /> : null}
       </ScrollView>
     </ScreenWrapper>
   );
@@ -272,12 +311,6 @@ const styles = StyleSheet.create({
     color: COLORS.TEXT_PRIMARY,
   },
   headerCard: {
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: COLORS.GLASS_BORDER,
-    backgroundColor: COLORS.BACKGROUND_ELEVATED,
-    padding: SPACING.space_5,
-    alignItems: 'center',
     gap: SPACING.space_2,
   },
   avatarWrapper: {
@@ -365,53 +398,44 @@ const styles = StyleSheet.create({
     color: COLORS.TEXT_PRIMARY,
     fontWeight: '600',
   },
-  sectionHeader: {
-    gap: 4,
-  },
   sectionTitle: {
     ...TYPOGRAPHY.H4,
     color: COLORS.TEXT_PRIMARY,
   },
-  sectionSubtitle: {
-    ...TYPOGRAPHY.Subtext,
-    color: COLORS.TEXT_SECONDARY,
+  focusCard: {
+    gap: SPACING.space_2,
   },
-  emptyText: {
-    ...TYPOGRAPHY.Subtext,
-    color: COLORS.TEXT_SECONDARY,
-  },
-  postCard: {
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: COLORS.GLASS_BORDER,
-    backgroundColor: COLORS.BACKGROUND_ELEVATED,
-    padding: SPACING.space_4,
-    gap: SPACING.space_1,
-  },
-  postType: {
-    ...TYPOGRAPHY.Subtext,
-    color: COLORS.TEXT_SECONDARY,
-  },
-  postTitle: {
-    ...TYPOGRAPHY.H4,
-    color: COLORS.TEXT_PRIMARY,
-  },
-  postSubtitle: {
+  focusText: {
     ...TYPOGRAPHY.Body,
     color: COLORS.TEXT_PRIMARY,
   },
-  postFooter: {
+  buddyCard: {
+    gap: SPACING.space_2,
+  },
+  buddyStatusText: {
+    ...TYPOGRAPHY.Body,
+    color: COLORS.TEXT_PRIMARY,
+  },
+  buddyActionsRow: {
+    gap: SPACING.space_2,
+  },
+  buddyButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: SPACING.space_2,
+    gap: SPACING.space_2,
   },
-  postMeta: {
-    ...TYPOGRAPHY.Subtext,
+  secondaryActionDisabled: {
+    opacity: 0.5,
+  },
+  secondaryActionTextDisabled: {
     color: COLORS.TEXT_SECONDARY,
   },
-  postTimestamp: {
-    ...TYPOGRAPHY.Subtext,
-    color: COLORS.TEXT_SECONDARY,
+  acceptButton: {
+    flex: 1,
+    borderColor: '#16a34a',
+  },
+  declineButton: {
+    flex: 1,
+    borderColor: '#f87171',
   },
 });
 

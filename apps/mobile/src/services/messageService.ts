@@ -68,6 +68,8 @@ export interface UserProfileSummary {
 export interface BuddyRelationship {
   isBuddy: boolean;
   buddyRequestStatus: 'pending' | 'accepted' | 'declined' | null;
+  buddyRequestDirection?: 'incoming' | 'outgoing' | null;
+  buddyRequestId?: string | null;
 }
 
 export interface BuddyPreview {
@@ -83,6 +85,7 @@ export interface UserProfileResponse {
   stats: {
     followers: number;
     following: number;
+    buddies: number;
   };
   relationships: {
     isSelf: boolean;
@@ -173,6 +176,54 @@ export interface UserProfileResponse {
       author: ProfilePreview;
     }>;
   }>;
+  hubCollections: {
+    communityPosts: CommunityPostSummary[];
+    challengesCreated: ChallengeCreatedSummary[];
+    challengesJoined: ChallengeParticipationSummary[];
+    buildUpdates: BuildUpdateSummary[];
+  };
+}
+
+type CommunityPostSummary = NonNullable<UserProfileResponse['latestContent']['community']>;
+type ChallengeCreatedSummary = NonNullable<UserProfileResponse['latestContent']['challengesCreated']>;
+type ChallengeParticipationSummary = NonNullable<UserProfileResponse['latestContent']['challengesJoined']>;
+type BuildUpdateSummary = NonNullable<UserProfileResponse['latestContent']['build']>;
+
+export interface BuddyListItem {
+  pairId: string;
+  buddy: {
+    id: string;
+    full_name?: string | null;
+    username?: string | null;
+    avatar_url?: string | null;
+    current_streak?: number | null;
+    focus_goal?: string | null;
+  };
+  paired_at: string;
+  last_interaction_at?: string | null;
+}
+
+export interface BuddyRequestsResponse {
+  incoming: Array<{
+    id: string;
+    from_user_id: string;
+    to_user_id: string;
+    status: 'pending' | 'accepted' | 'declined';
+    message?: string | null;
+    created_at: string;
+    responded_at?: string | null;
+    from_user: ProfilePreview;
+  }>;
+  outgoing: Array<{
+    id: string;
+    from_user_id: string;
+    to_user_id: string;
+    status: 'pending' | 'accepted' | 'declined';
+    message?: string | null;
+    created_at: string;
+    responded_at?: string | null;
+    to_user: ProfilePreview;
+  }>;
 }
 
 export async function fetchThreads(): Promise<MessageThread[]> {
@@ -222,5 +273,34 @@ export async function uploadAvatar(imageBase64: string, mimeType: string) {
   return request<{ avatar_url: string }>(`/profiles/avatar`, {
     method: 'POST',
     body: JSON.stringify({ image_base64: imageBase64, mime_type: mimeType }),
+  });
+}
+
+export async function updateFocusGoal(focusGoal: string | null) {
+  return request<{ focus_goal: string | null }>(`/profiles/focus-goal`, {
+    method: 'PUT',
+    body: JSON.stringify({ focus_goal: focusGoal }),
+  });
+}
+
+export async function fetchBuddies(): Promise<BuddyListItem[]> {
+  return request('/buddies');
+}
+
+export async function fetchBuddyRequests(): Promise<BuddyRequestsResponse> {
+  return request('/buddies/requests');
+}
+
+export async function sendBuddyRequest(userId: string, message?: string) {
+  return request(`/buddies/${userId}/request`, {
+    method: 'POST',
+    body: JSON.stringify({ message }),
+  });
+}
+
+export async function respondToBuddyRequest(requestId: string, action: 'accept' | 'decline') {
+  return request(`/buddies/requests/${requestId}/respond`, {
+    method: 'POST',
+    body: JSON.stringify({ action }),
   });
 }

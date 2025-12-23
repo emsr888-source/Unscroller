@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, StatusBar, ScrollView, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -9,13 +9,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import WatercolorBackdrop from '@/components/watercolor/WatercolorBackdrop';
 import WatercolorCard from '@/components/watercolor/WatercolorCard';
 import { useAppStore } from '@/store';
-import { uploadAvatar } from '@/services/messageService';
+import { getUserProfile, updateFocusGoal, uploadAvatar, UserProfileResponse } from '@/services/messageService';
 import { supabase } from '@/services/supabase';
+import { ProfileHubSections, buildProfileSections, HubSectionViewModel } from '@/screens/profile/ProfileHubSections';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
 
 export default function ProfileScreen({ navigation }: Props) {
-  const { profileGoal } = useAppStore();
+  const { profileGoal, setProfileGoal } = useAppStore();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('Alex Builder');
   const [bio, setBio] = useState('Building my dreams, one day at a time');
@@ -24,32 +25,93 @@ export default function ProfileScreen({ navigation }: Props) {
   const [profileImageUri, setProfileImageUri] = useState<string | null>(null);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  
+  const [profileData, setProfileData] = useState<UserProfileResponse | null>(null);
+  const [hubSections, setHubSections] = useState<HubSectionViewModel[]>([]);
+  const [focusGoalInput, setFocusGoalInput] = useState(profileGoal ?? '');
+  const [loading, setLoading] = useState(true);
+  const [savingGoal, setSavingGoal] = useState(false);
+
   const avatarOptions = ['👨‍💻', '👩‍💻', '🚀', '🎯', '⚡', '🔥', '💎', '🌟', '🎨', '🏆', '💪', '🧠'];
+
+  const loadUserProfile = useCallback(async () => {
+    setLoading(true);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setProfileData(null);
+        return;
+      }
+
+      const response = await getUserProfile(user.id);
+      setProfileData(response);
+      setProfileImageUri(response.profile.avatar_url || null);
+      setName(response.profile.full_name || 'Creator');
+      setBio(response.profile.bio || '');
+      setCurrentProject(response.profile.current_project || 'Focus project');
+      setHubSections(buildProfileSections(response));
+
+      const focusGoalValue = response.profile.focus_goal ?? '';
+      setFocusGoalInput(focusGoalValue);
+      setProfileGoal(focusGoalValue);
+    } catch (error) {
+      Alert.alert('Unable to load profile', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [setProfileGoal]);
 
   useEffect(() => {
     loadUserProfile();
-  }, []);
+  }, [loadUserProfile]);
 
-  const loadUserProfile = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      
-      // Load avatar from user_profiles
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('avatar_url')
-        .eq('user_id', user.id)
-        .single();
-      
-      if (profile?.avatar_url) {
-        setProfileImageUri(profile.avatar_url);
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
+  const displayGoal = useMemo(() => (profileGoal?.trim() ? profileGoal.trim() : ''), [profileGoal]);
+  const hasUnsavedGoalChanges = useMemo(
+    () => focusGoalInput.trim() !== (profileGoal ?? '').trim(),
+    [focusGoalInput, profileGoal],
+  );
+
+  const persistFocusGoal = useCallback(async () => {
+    if (!hasUnsavedGoalChanges) {
+      return true;
     }
-  };
+    setSavingGoal(true);
+    const normalized = focusGoalInput.trim();
+    try {
+      const { focus_goal } = await updateFocusGoal(normalized || null);
+      const resolved = focus_goal ?? '';
+      setProfileGoal(resolved);
+      setProfileData(prev =>
+        prev
+          ? {
+              ...prev,
+              profile: {
+                ...prev.profile,
+                focus_goal: focus_goal ?? null,
+              },
+            }
+          : prev,
+      );
+      setFocusGoalInput(resolved);
+      return true;
+    } catch (error) {
+      Alert.alert('Unable to save focus goal', error instanceof Error ? error.message : 'Please try again.');
+      return false;
+    } finally {
+      setSavingGoal(false);
+    }
+  }, [focusGoalInput, hasUnsavedGoalChanges, setProfileGoal]);
+
+  const handleEditToggle = useCallback(async () => {
+    if (isEditing) {
+      const saved = await persistFocusGoal();
+      if (!saved) {
+        return;
+      }
+    }
+    setIsEditing(prev => !prev);
+  }, [isEditing, persistFocusGoal]);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -107,14 +169,21 @@ export default function ProfileScreen({ navigation }: Props) {
       }
     }
   };
-  const displayGoal = useMemo(() => profileGoal?.trim(), [profileGoal]);
 
-  const stats = {
-    streak: 45,
-    totalDays: 90,
-    projectsShipped: 3,
-    communityPosts: 12,
-  };
+  if (loading && !profileData) {
+    return (
+      <View style={styles.loadingWrapper}>
+        <StatusBar barStyle="dark-content" backgroundColor="#fdfbf7" />
+        <ActivityIndicator size="large" color="#0ea5e9" />
+        <Text style={styles.loadingText}>Loading your profile…</Text>
+      </View>
+    );
+  }
+
+  const currentStreak = profileData?.profile.current_streak ?? 0;
+  const followerCount = profileData?.stats.followers ?? 0;
+  const followingCount = profileData?.stats.following ?? 0;
+  const buddyCount = profileData?.stats.buddies ?? 0;
 
   return (
     <View style={styles.root}>
@@ -127,7 +196,7 @@ export default function ProfileScreen({ navigation }: Props) {
               <Text style={styles.iconLabel}>←</Text>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Profile</Text>
-            <TouchableOpacity onPress={() => setIsEditing(!isEditing)} style={styles.iconButton} hitSlop={10}>
+            <TouchableOpacity onPress={handleEditToggle} style={styles.iconButton} hitSlop={10}>
               <Text style={styles.iconLabel}>{isEditing ? '✓' : '✏️'}</Text>
             </TouchableOpacity>
           </View>
@@ -155,7 +224,7 @@ export default function ProfileScreen({ navigation }: Props) {
               </TouchableOpacity>
               <View style={styles.streakPill}>
                 <Text style={styles.streakIcon}>🔥</Text>
-                <Text style={styles.streakText}>{stats.streak} day streak</Text>
+                <Text style={styles.streakText}>{currentStreak} day streak</Text>
               </View>
             </View>
 
@@ -231,8 +300,8 @@ export default function ProfileScreen({ navigation }: Props) {
             {isEditing ? (
               <TextInput
                 style={styles.goalInput}
-                value={displayGoal ?? ''}
-                onChangeText={setCurrentProject}
+                value={focusGoalInput}
+                onChangeText={setFocusGoalInput}
                 placeholder="Describe your focus"
                 placeholderTextColor="#9ca3af"
               />
@@ -241,22 +310,29 @@ export default function ProfileScreen({ navigation }: Props) {
                 {displayGoal || 'Your 30-day goal will appear here once you set it.'}
               </Text>
             )}
+            {isEditing && (
+              <Text style={styles.goalStatus}>{savingGoal ? 'Saving…' : hasUnsavedGoalChanges ? 'Unsaved changes' : 'Saved'}</Text>
+            )}
           </WatercolorCard>
 
           <WatercolorCard style={styles.statsCard} backgroundColor="#fff">
             <Text style={styles.sectionTitle}>Momentum</Text>
             <View style={styles.statsRow}>
               <View style={styles.statBubble}>
-                <Text style={styles.statValue}>{stats.totalDays}</Text>
-                <Text style={styles.statLabel}>Days logged</Text>
+                <Text style={styles.statValue}>{currentStreak}</Text>
+                <Text style={styles.statLabel}>Day streak</Text>
               </View>
               <View style={styles.statBubble}>
-                <Text style={styles.statValue}>{stats.projectsShipped}</Text>
-                <Text style={styles.statLabel}>Shipped</Text>
+                <Text style={styles.statValue}>{followerCount}</Text>
+                <Text style={styles.statLabel}>Followers</Text>
               </View>
               <View style={styles.statBubble}>
-                <Text style={styles.statValue}>{stats.communityPosts}</Text>
-                <Text style={styles.statLabel}>Posts</Text>
+                <Text style={styles.statValue}>{followingCount}</Text>
+                <Text style={styles.statLabel}>Following</Text>
+              </View>
+              <View style={styles.statBubble}>
+                <Text style={styles.statValue}>{buddyCount}</Text>
+                <Text style={styles.statLabel}>Buddies</Text>
               </View>
             </View>
           </WatercolorCard>
@@ -298,6 +374,10 @@ export default function ProfileScreen({ navigation }: Props) {
             </TouchableOpacity>
           </WatercolorCard>
 
+          {hubSections.length ? (
+            <ProfileHubSections sections={hubSections} navigation={navigation} />
+          ) : null}
+
           <View style={styles.bottomSpacing} />
         </ScrollView>
       </SafeAreaView>
@@ -309,6 +389,18 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#fdfbf7',
+  },
+  loadingWrapper: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fdfbf7',
+  },
+  loadingText: {
+    marginTop: SPACING.space_2,
+    fontFamily: 'PatrickHand-Regular',
+    fontSize: 18,
+    color: '#475569',
   },
   safeArea: {
     flex: 1,
@@ -536,6 +628,12 @@ const styles = StyleSheet.create({
     fontFamily: 'PatrickHand-Regular',
     fontSize: 17,
     color: '#1f2937',
+  },
+  goalStatus: {
+    fontFamily: 'PatrickHand-Regular',
+    fontSize: 14,
+    color: '#64748b',
+    marginTop: 6,
   },
   goalPlaceholder: {
     color: '#94a3b8',

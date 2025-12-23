@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -22,8 +22,12 @@ import { TYPOGRAPHY } from '@/core/theme/typography';
 import {
   DirectMessage,
   fetchConversation,
+  getUserProfile,
   markThreadAsRead,
+  respondToBuddyRequest,
+  sendBuddyRequest,
   sendDirectMessage,
+  UserProfileResponse,
 } from '@/services/messageService';
 import { blockUser } from '@/services/communityService';
 import { supabase } from '@/services/supabase';
@@ -50,6 +54,8 @@ export default function DirectMessageThreadScreen({ navigation, route }: Props) 
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [partnerProfile, setPartnerProfile] = useState<UserProfileResponse | null>(null);
+  const [buddyActionLoading, setBuddyActionLoading] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -76,16 +82,27 @@ export default function DirectMessageThreadScreen({ navigation, route }: Props) 
     }
   }, [partnerId]);
 
+  const loadBuddyStatus = useCallback(async () => {
+    try {
+      const profile = await getUserProfile(partnerId);
+      setPartnerProfile(profile);
+    } catch (error) {
+      Alert.alert('Unable to load buddy status', error instanceof Error ? error.message : 'Try again shortly.');
+    }
+  }, [partnerId]);
+
   useFocusEffect(
     useCallback(() => {
       loadConversation();
+      loadBuddyStatus();
       markThreadAsRead(partnerId).catch(() => undefined);
       const interval = setInterval(() => {
         loadConversation();
+        loadBuddyStatus();
         markThreadAsRead(partnerId).catch(() => undefined);
       }, POLL_INTERVAL);
       return () => clearInterval(interval);
-    }, [loadConversation, partnerId]),
+    }, [loadConversation, loadBuddyStatus, partnerId]),
   );
 
   useEffect(() => {
@@ -95,6 +112,10 @@ export default function DirectMessageThreadScreen({ navigation, route }: Props) 
   }, [messages]);
 
   const handleSend = async () => {
+    if (!(partnerProfile?.relationships.isBuddy ?? false)) {
+      Alert.alert('Buddies only', 'Send a buddy request before messaging.');
+      return;
+    }
     const text = input.trim();
     if (!text || sending) return;
     setSending(true);
@@ -145,6 +166,90 @@ export default function DirectMessageThreadScreen({ navigation, route }: Props) 
     );
   };
 
+  const handleSendBuddyRequest = async () => {
+    setBuddyActionLoading(true);
+    try {
+      await sendBuddyRequest(partnerId);
+      await loadBuddyStatus();
+      Alert.alert('Request sent', 'They will need to accept before chatting.');
+    } catch (error) {
+      Alert.alert('Unable to send request', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setBuddyActionLoading(false);
+    }
+  };
+
+  const handleRespondToBuddyRequest = async (action: 'accept' | 'decline') => {
+    if (!partnerProfile?.relationships.buddyRequestId) return;
+    setBuddyActionLoading(true);
+    try {
+      await respondToBuddyRequest(partnerProfile.relationships.buddyRequestId, action);
+      await loadBuddyStatus();
+    } catch (error) {
+      Alert.alert('Unable to update request', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setBuddyActionLoading(false);
+    }
+  };
+
+  const buddyRelationship = partnerProfile?.relationships;
+  const canMessage = buddyRelationship?.isBuddy ?? false;
+  const showBuddyGate = useMemo(() => {
+    if (!buddyRelationship) return false;
+    return !buddyRelationship.isBuddy;
+  }, [buddyRelationship]);
+
+  const renderBuddyGate = () => {
+    if (!showBuddyGate || !buddyRelationship) return null;
+    return (
+      <View style={styles.buddyGateCard}>
+        {buddyRelationship.buddyRequestStatus === 'pending' ? (
+          buddyRelationship.buddyRequestDirection === 'incoming' ? (
+            <>
+              <Text style={styles.buddyGateTitle}>Buddy request pending</Text>
+              <Text style={styles.buddyGateSubtitle}>Accept to unlock DMs.</Text>
+              <View style={styles.buddyGateButtons}>
+                <TouchableOpacity
+                  style={[styles.buddyGateButton, styles.acceptButton]}
+                  onPress={() => handleRespondToBuddyRequest('accept')}
+                  disabled={buddyActionLoading}
+                >
+                  <Text style={styles.buddyGateButtonText}>Accept</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.buddyGateButton, styles.declineButton]}
+                  onPress={() => handleRespondToBuddyRequest('decline')}
+                  disabled={buddyActionLoading}
+                >
+                  <Text style={styles.buddyGateButtonText}>Decline</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <>
+              <Text style={styles.buddyGateTitle}>Waiting on acceptance</Text>
+              <Text style={styles.buddyGateSubtitle}>You’ll be able to chat once they accept.</Text>
+            </>
+          )
+        ) : (
+          <>
+            <Text style={styles.buddyGateTitle}>Buddy required</Text>
+            <Text style={styles.buddyGateSubtitle}>Send a buddy request to start messaging.</Text>
+            <TouchableOpacity
+              style={[styles.buddyGateButton, styles.acceptButton]}
+              onPress={handleSendBuddyRequest}
+              disabled={buddyActionLoading}
+            >
+              <Text style={styles.buddyGateButtonText}>
+                {buddyActionLoading ? 'Sending…' : 'Send buddy request'}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+    );
+  };
+
   return (
     <ScreenWrapper>
       <KeyboardAvoidingView
@@ -170,6 +275,7 @@ export default function DirectMessageThreadScreen({ navigation, route }: Props) 
           </TouchableOpacity>
         </View>
 
+        {renderBuddyGate()}
         <ScrollView ref={scrollRef} style={styles.messages} contentContainerStyle={styles.messagesContent} showsVerticalScrollIndicator={false}>
           {loading ? (
             <ActivityIndicator color={COLORS.ACCENT_GRADIENT_START} style={styles.loader} />
@@ -180,14 +286,24 @@ export default function DirectMessageThreadScreen({ navigation, route }: Props) 
 
         <View style={styles.inputBar}>
           <TextInput
-            style={styles.input}
-            placeholder="Message..."
+            style={[styles.input, !canMessage && styles.inputDisabled]}
+            placeholder={
+              canMessage ? 'Message...' : 'Buddy up to unlock messaging'
+            }
             placeholderTextColor={COLORS.TEXT_SECONDARY}
             value={input}
             onChangeText={setInput}
             multiline
+            editable={canMessage}
           />
-          <TouchableOpacity style={[styles.sendButton, (!input.trim() || sending) && styles.sendButtonDisabled]} onPress={handleSend} disabled={!input.trim() || sending}>
+          <TouchableOpacity
+            style={[
+              styles.sendButton,
+              (!input.trim() || sending || !canMessage) && styles.sendButtonDisabled,
+            ]}
+            onPress={handleSend}
+            disabled={!input.trim() || sending || !canMessage}
+          >
             {sending ? <ActivityIndicator color={COLORS.BACKGROUND_MAIN} /> : <Text style={styles.sendIcon}>➤</Text>}
           </TouchableOpacity>
         </View>
@@ -263,6 +379,47 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.space_4,
     gap: SPACING.space_2,
   },
+  buddyGateCard: {
+    marginHorizontal: SPACING.space_4,
+    marginTop: SPACING.space_2,
+    marginBottom: SPACING.space_2,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.GLASS_BORDER,
+    padding: SPACING.space_3,
+    gap: SPACING.space_2,
+    backgroundColor: COLORS.BACKGROUND_ELEVATED,
+  },
+  buddyGateTitle: {
+    ...TYPOGRAPHY.H4,
+    color: COLORS.TEXT_PRIMARY,
+  },
+  buddyGateSubtitle: {
+    ...TYPOGRAPHY.Subtext,
+    color: COLORS.TEXT_SECONDARY,
+  },
+  buddyGateButtons: {
+    flexDirection: 'row',
+    gap: SPACING.space_2,
+  },
+  buddyGateButton: {
+    flex: 1,
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  buddyGateButtonText: {
+    ...TYPOGRAPHY.Subtext,
+    fontWeight: '600',
+    color: COLORS.TEXT_PRIMARY,
+  },
+  acceptButton: {
+    borderColor: '#16a34a',
+  },
+  declineButton: {
+    borderColor: '#f87171',
+  },
   loader: {
     marginTop: SPACING.space_6,
   },
@@ -320,6 +477,9 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.space_2,
     backgroundColor: COLORS.BACKGROUND_ELEVATED,
     color: COLORS.TEXT_PRIMARY,
+  },
+  inputDisabled: {
+    opacity: 0.6,
   },
   sendButton: {
     width: 44,
