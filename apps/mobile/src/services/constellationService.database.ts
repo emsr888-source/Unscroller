@@ -4,6 +4,7 @@
  */
 
 import { supabase } from './supabase';
+import type { AchievementDefinition } from '@/constants/achievements';
 
 export type ConstellationType = 'deep_work' | 'better_sleep' | 'relationships' | 'self_confidence' | 'creativity' | 'physical_health';
 export type StarType = 'focus_session' | 'time_saved' | 'goal_completed' | 'milestone';
@@ -283,6 +284,18 @@ class ConstellationServiceDB {
       constellation,
       description: milestoneDescription,
       size: 'large'
+    });
+  }
+
+  /**
+   * Award star for achievement unlock
+   */
+  async awardAchievementStar(userId: string, achievement: AchievementDefinition): Promise<Star | null> {
+    return this.awardStar(userId, {
+      type: 'milestone',
+      constellation: achievement.constellation,
+      description: `Achievement: ${achievement.title}`,
+      size: achievement.starSize ?? 'medium'
     });
   }
 

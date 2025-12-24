@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, StatusBar, ScrollView, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation/AppNavigator';
@@ -7,6 +7,9 @@ import { SPACING } from '@/core/theme/spacing';
 import { TYPOGRAPHY } from '@/core/theme/typography';
 import { ScreenWrapper } from '@/features/onboarding/components/ScreenWrapper';
 import { PrimaryButton } from '@/features/onboarding/components/PrimaryButton';
+import { useXP } from '@/hooks/useXP';
+import { constellationServiceDB } from '@/services/constellationService.database';
+import { supabase, isSupabaseConfigured } from '@/services/supabase';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CheckIn'>;
 
@@ -14,7 +17,10 @@ export default function CheckInScreen({ navigation }: Props) {
   const { height, width } = useWindowDimensions();
   const isCompact = height < 720;
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
-  const [streak, setStreak] = useState(5);
+  const [streak, setStreak] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const { awardDailyCheckinXP } = useXP();
 
   const stars = useMemo(
     () =>
@@ -28,13 +34,72 @@ export default function CheckInScreen({ navigation }: Props) {
     [height, width]
   );
 
-  const handleCheckIn = () => {
-    setHasCheckedIn(true);
-    setStreak(prev => prev + 1);
-    setTimeout(() => {
-      navigation.goBack();
-    }, 2000);
-  };
+  const loadStreak = useCallback(async () => {
+    if (!isSupabaseConfigured() || !supabase) {
+      setStreak(prev => (prev === 0 ? 5 : prev));
+      return;
+    }
+
+    try {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error) {
+        throw error;
+      }
+
+      if (!user) {
+        setStreak(prev => (prev === 0 ? 5 : prev));
+        return;
+      }
+
+      setUserId(user.id);
+      const skyState = await constellationServiceDB.getSkyState(user.id);
+      setStreak(skyState.currentStreak || 0);
+    } catch (error) {
+      console.warn('[CheckIn] Failed to load streak', error);
+      setStreak(prev => (prev === 0 ? 5 : prev));
+    }
+  }, []);
+
+  useEffect(() => {
+    loadStreak();
+  }, [loadStreak]);
+
+  const handleCheckIn = useCallback(async () => {
+    if (hasCheckedIn || submitting) {
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      try {
+        await awardDailyCheckinXP();
+      } catch (error) {
+        console.warn('[CheckIn] Failed to award daily XP', error);
+      }
+
+      const nextStreak = streak + 1;
+      setStreak(nextStreak);
+      setHasCheckedIn(true);
+
+      if (userId) {
+        try {
+          await constellationServiceDB.updateStreak(userId, nextStreak);
+        } catch (error) {
+          console.warn('[CheckIn] Failed to update streak in Supabase', error);
+        }
+      }
+
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
+    } finally {
+      setSubmitting(false);
+    }
+  }, [awardDailyCheckinXP, hasCheckedIn, navigation, streak, submitting, userId]);
 
   return (
     <ScreenWrapper>

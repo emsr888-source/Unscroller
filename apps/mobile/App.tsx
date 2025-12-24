@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import AppNavigator from './src/navigation/AppNavigator';
+import { LevelUpCelebrationHost } from './src/components/LevelUpCelebrationHost';
 import { PolicyService } from './src/services/policy';
 import { useBlockingStore } from './src/features/blocking/blockingStore';
 import { isExpoGo } from './src/utils/isExpoGo';
@@ -41,18 +43,23 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        {!isExpoGo && (
-          <StatusBar 
-            animated={true}
-            barStyle="dark-content" 
-            backgroundColor="#fdfbf7"
-            hidden={false}
-          />
-        )}
-        <AppNavigator />
-      </QueryClientProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          {!isExpoGo && (
+            <StatusBar 
+              animated={true}
+              barStyle="dark-content" 
+              backgroundColor="#fdfbf7"
+              hidden={false}
+            />
+          )}
+          <>
+            <AppNavigator />
+            <LevelUpCelebrationHost />
+          </>
+        </QueryClientProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

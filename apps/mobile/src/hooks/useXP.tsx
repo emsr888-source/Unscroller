@@ -2,6 +2,11 @@ import { useState, useCallback, useEffect } from 'react';
 import { challengesServiceDB as challengesService } from '@/services/challengesService.database';
 import { aiServiceDB as aiService } from '@/services/aiService.database';
 import { supabase } from '@/services/supabase';
+import { ACHIEVEMENTS } from '@/constants/achievements';
+import { achievementsServiceDB } from '@/services/achievementsService.database';
+import { constellationServiceDB } from '@/services/constellationService.database';
+import { emitLevelUp } from '@/state/gamificationEvents';
+
 
 export interface XPEvent {
   id: string;
@@ -24,6 +29,7 @@ export function useXP() {
     unlockedFeatures: [] 
   });
   const [xpEvents, setXPEvents] = useState<XPEvent[]>([]);
+  const [achievementIds, setAchievementIds] = useState<string[]>([]);
 
   // Load user ID on mount
   useEffect(() => {
@@ -31,15 +37,59 @@ export function useXP() {
       if (!supabase) return;
       
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-        // Load current level
-        const level = await challengesService.getUserLevel(user.id);
-        setUserLevel(level);
-      }
+      if (!user) return;
+
+      setUserId(user.id);
+      // Load current level
+      const level = await challengesService.getUserLevel(user.id);
+      setUserLevel(level);
+
+      // Load unlocked achievements
+      const unlocked = await achievementsServiceDB.getUnlockedAchievements(user.id);
+      setAchievementIds(unlocked);
     }
     loadUser();
   }, []);
+
+  /**
+   * Handle level up celebration
+   */
+  const handleLevelUp = useCallback(async (level: number, title: string) => {
+    if (!userId) {
+      return;
+    }
+
+    console.log(`🎉 LEVEL UP! Now Level ${level}: ${title}`);
+
+    // Get AI celebration message
+    const celebration = aiService.getCelebrationMessage({
+      type: 'level',
+      value: level
+    });
+
+    const newlyUnlocked = ACHIEVEMENTS.filter(achievement => achievement.unlockLevel <= level && !achievementIds.includes(achievement.id));
+
+    if (newlyUnlocked.length > 0) {
+      const updatedIds = new Set(achievementIds);
+
+      for (const achievement of newlyUnlocked) {
+        const unlocked = await achievementsServiceDB.unlockAchievement(userId, achievement.id);
+        if (unlocked) {
+          updatedIds.add(achievement.id);
+          await constellationServiceDB.awardAchievementStar(userId, achievement);
+        }
+      }
+
+      setAchievementIds(Array.from(updatedIds));
+    }
+
+    emitLevelUp({
+      level,
+      title,
+      celebration,
+      unlockedAchievements: newlyUnlocked,
+    });
+  }, [achievementIds, userId]);
 
   /**
    * Award XP for an action
@@ -77,28 +127,11 @@ export function useXP() {
 
     // Check for level up
     if (newLevel.level > previousLevel) {
-      handleLevelUp(newLevel.level, newLevel.title);
+      await handleLevelUp(newLevel.level, newLevel.title);
     }
 
     return amount;
-  }, [userId, userLevel.level]);
-
-  /**
-   * Handle level up celebration
-   */
-  const handleLevelUp = useCallback((level: number, title: string) => {
-    console.log(`🎉 LEVEL UP! Now Level ${level}: ${title}`);
-
-    // Get AI celebration message
-    const celebration = aiService.getCelebrationMessage({
-      type: 'level',
-      value: level
-    });
-
-    console.log('AI Celebration:', celebration);
-
-    // TODO: Show confetti animation, play sound, send push notification
-  }, []);
+  }, [handleLevelUp, userId, userLevel.level]);
 
   /**
    * Award XP for focus session completion

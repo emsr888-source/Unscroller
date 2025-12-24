@@ -1,0 +1,8 @@
+source 'https://rubygems.org'
+
+git_source(:cocoapods) { |repo| "https://github.com/CocoaPods/#{repo}.git" }
+
+gem 'cocoapods', git: 'https://github.com/CocoaPods/CocoaPods.git', branch: 'master'
+gem 'xcodeproj', git: 'https://github.com/CocoaPods/Xcodeproj.git', ref: 'ab3dfa504b5a97cae3a653a8924f4616dcaa062e'
+gem 'nkf'
+

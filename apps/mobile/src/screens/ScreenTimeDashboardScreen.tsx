@@ -25,6 +25,8 @@ export default function ScreenTimeDashboardScreen(_: Props) {
   const lastFetchedAt = useBlockingStore(selectUsageFetchedAt);
   const capability = useBlockingStore(selectBlockingCapability);
   const refreshUsageSummary = useBlockingStore(state => state.refreshUsageSummary);
+  const showUsageReport = useBlockingStore(state => state.showUsageReport);
+  const authorize = useBlockingStore(state => state.authorize);
 
   const fetchSummary = useCallback(async () => {
     setIsRefreshing(true);
@@ -59,6 +61,12 @@ export default function ScreenTimeDashboardScreen(_: Props) {
   }, [usageSummary]);
 
   const perApp = usageSummary?.perApp ?? [];
+  const handleOpenReport = useCallback(async () => {
+    if (!capability.authorized) {
+      await authorize();
+    }
+    await showUsageReport();
+  }, [authorize, capability.authorized, showUsageReport]);
 
   return (
     <ScreenWrapper contentStyle={styles.container}>
@@ -83,6 +91,12 @@ export default function ScreenTimeDashboardScreen(_: Props) {
           {lastFetchedAt ? (
             <Text style={styles.summaryMeta}>Updated {new Date(lastFetchedAt).toLocaleTimeString()}</Text>
           ) : null}
+          <TouchableOpacity style={styles.reportButton} activeOpacity={0.9} onPress={handleOpenReport}>
+            <Text style={styles.reportButtonText}>
+              {capability.authorized ? 'View Screen Time Insights' : 'Authorize & View Insights'}
+            </Text>
+            <Text style={styles.reportButtonHint}>Opens the secure Apple Screen Time report</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.sectionHeader}>
@@ -178,6 +192,25 @@ const styles = StyleSheet.create({
     marginTop: SPACING.space_2,
     fontSize: 12,
     color: COLORS.TEXT_SECONDARY,
+  },
+  reportButton: {
+    marginTop: SPACING.space_4,
+    borderRadius: 16,
+    paddingVertical: SPACING.space_3,
+    paddingHorizontal: SPACING.space_4,
+    backgroundColor: COLORS.ACCENT_GRADIENT_START,
+  },
+  reportButtonText: {
+    ...TYPOGRAPHY.H4,
+    textAlign: 'center',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  reportButtonHint: {
+    ...TYPOGRAPHY.Subtext,
+    textAlign: 'center',
+    color: '#FFFFFF',
+    opacity: 0.8,
   },
   sectionHeader: {
     flexDirection: 'row',

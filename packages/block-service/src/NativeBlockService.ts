@@ -30,6 +30,7 @@ export interface Spec extends TurboModule {
   allowOneMinute(appId: string): Promise<void>;
   openPermissionSettings(target: 'usage' | 'accessibility' | 'overlay' | 'app_settings'): Promise<void>;
   getPermissionState(): Promise<{ usage: boolean; accessibility: boolean; overlay: boolean }>;
+  showUsageReport(): Promise<void>;
 }
 
 export const MODULE_NAME = 'BlockService';
@@ -61,6 +62,7 @@ const fallback: Spec = {
   allowOneMinute: async () => {},
   openPermissionSettings: async () => {},
   getPermissionState: async () => ({ usage: false, accessibility: false, overlay: false }),
+  showUsageReport: async () => {},
 };
 
 export default BlockServiceModule ?? (fallback as unknown as Spec);

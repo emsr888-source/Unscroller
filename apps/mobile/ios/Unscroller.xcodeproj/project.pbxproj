@@ -3,18 +3,114 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		98EA755402CA3DDE23AF3B4C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 4EFD501B808FCAA0FD1B3F4B /* PrivacyInfo.xcprivacy */; };
+		B340E4F92EFB1EEC0026E651 /* BlockServiceMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B340E4EF2EFB1EEC0026E651 /* BlockServiceMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B340E50F2EFB1F160026E651 /* BlockServiceReport.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = B340E5032EFB1F160026E651 /* BlockServiceReport.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B340E5252EFB1F370026E651 /* BlockServiceShield.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B340E5192EFB1F370026E651 /* BlockServiceShield.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B340E7052EFB60030026E651 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B340E4F02EFB1EEC0026E651 /* DeviceActivity.framework */; };
+		B340E7062EFB60030026E651 /* DeviceActivity.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B340E4F02EFB1EEC0026E651 /* DeviceActivity.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B340E7082EFB60080026E651 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B340E51A2EFB1F370026E651 /* ManagedSettings.framework */; };
+		B340E7092EFB60080026E651 /* ManagedSettings.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B340E51A2EFB1F370026E651 /* ManagedSettings.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B340E70B2EFB600A0026E651 /* ManagedSettingsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B340E51C2EFB1F370026E651 /* ManagedSettingsUI.framework */; };
+		B340E70C2EFB600A0026E651 /* ManagedSettingsUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B340E51C2EFB1F370026E651 /* ManagedSettingsUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		EB7BE5696E8F387198C712B2 /* libPods-Unscroller.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFEDCBF88985363F24300C53 /* libPods-Unscroller.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 		FD2D2D2FD2D9B8DCF467FD8E /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054A7D1FA7D5E22F71D34ED8 /* ExpoModulesProvider.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		B340E4EA2EFB1CE30026E651 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = pattern.proxy;
+			inputFiles = (
+			);
+			isEditable = 1;
+			outputFiles = (
+			);
+			script = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
+/* End PBXBuildRule section */
+
+/* Begin PBXContainerItemProxy section */
+		B340E4F72EFB1EEC0026E651 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B340E4EE2EFB1EEC0026E651;
+			remoteInfo = BlockServiceMonitor;
+		};
+		B340E50D2EFB1F160026E651 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B340E5022EFB1F160026E651;
+			remoteInfo = BlockServiceReport;
+		};
+		B340E5232EFB1F370026E651 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B340E5182EFB1F370026E651;
+			remoteInfo = BlockServiceShield;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B340E4FE2EFB1EED0026E651 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B340E4F92EFB1EEC0026E651 /* BlockServiceMonitor.appex in Embed Foundation Extensions */,
+				B340E5252EFB1F370026E651 /* BlockServiceShield.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E5142EFB1F160026E651 /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolderSpec = 16;
+			files = (
+				B340E50F2EFB1F160026E651 /* BlockServiceReport.appex in Embed ExtensionKit Extensions */,
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E7072EFB60030026E651 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B340E7062EFB60030026E651 /* DeviceActivity.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E70A2EFB60080026E651 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B340E7092EFB60080026E651 /* ManagedSettings.framework in Embed Frameworks */,
+				B340E70C2EFB600A0026E651 /* ManagedSettingsUI.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		054A7D1FA7D5E22F71D34ED8 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Unscroller/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
@@ -23,8 +119,14 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Unscroller/Info.plist; sourceTree = "<group>"; };
 		395BC0C76E396F6DC8EDD5E2 /* Pods-Unscroller.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Unscroller.release.xcconfig"; path = "Target Support Files/Pods-Unscroller/Pods-Unscroller.release.xcconfig"; sourceTree = "<group>"; };
 		44C8E9F1A1B784B23E23AFA9 /* Pods-Unscroller.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Unscroller.debug.xcconfig"; path = "Target Support Files/Pods-Unscroller/Pods-Unscroller.debug.xcconfig"; sourceTree = "<group>"; };
-		4EFD501B808FCAA0FD1B3F4B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Unscroller/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		4EFD501B808FCAA0FD1B3F4B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Unscroller/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Unscroller/SplashScreen.storyboard; sourceTree = "<group>"; };
+		B340E4EF2EFB1EEC0026E651 /* BlockServiceMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BlockServiceMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B340E4F02EFB1EEC0026E651 /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
+		B340E5032EFB1F160026E651 /* BlockServiceReport.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = BlockServiceReport.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B340E5192EFB1F370026E651 /* BlockServiceShield.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BlockServiceShield.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B340E51A2EFB1F370026E651 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
+		B340E51C2EFB1F370026E651 /* ManagedSettingsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettingsUI.framework; path = System/Library/Frameworks/ManagedSettingsUI.framework; sourceTree = SDKROOT; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		BFEDCBF88985363F24300C53 /* libPods-Unscroller.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Unscroller.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -32,12 +134,99 @@
 		F11748442D0722820044C1D9 /* Unscroller-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Unscroller-Bridging-Header.h"; path = "Unscroller/Unscroller-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B340E4FA2EFB1EED0026E651 /* Exceptions for "BlockServiceMonitor" folder in "BlockServiceMonitor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B340E4EE2EFB1EEC0026E651 /* BlockServiceMonitor */;
+		};
+		B340E5102EFB1F160026E651 /* Exceptions for "BlockServiceReport" folder in "BlockServiceReport" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B340E5022EFB1F160026E651 /* BlockServiceReport */;
+		};
+		B340E5262EFB1F370026E651 /* Exceptions for "BlockServiceShield" folder in "BlockServiceShield" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B340E5182EFB1F370026E651 /* BlockServiceShield */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		B340E4F22EFB1EEC0026E651 /* BlockServiceMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B340E4FA2EFB1EED0026E651 /* Exceptions for "BlockServiceMonitor" folder in "BlockServiceMonitor" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = BlockServiceMonitor;
+			sourceTree = "<group>";
+		};
+		B340E5042EFB1F160026E651 /* BlockServiceReport */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B340E5102EFB1F160026E651 /* Exceptions for "BlockServiceReport" folder in "BlockServiceReport" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = BlockServiceReport;
+			sourceTree = "<group>";
+		};
+		B340E51E2EFB1F370026E651 /* BlockServiceShield */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B340E5262EFB1F370026E651 /* Exceptions for "BlockServiceShield" folder in "BlockServiceShield" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = BlockServiceShield;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				EB7BE5696E8F387198C712B2 /* libPods-Unscroller.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E4EC2EFB1EEC0026E651 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B340E7052EFB60030026E651 /* DeviceActivity.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E5002EFB1F160026E651 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E5162EFB1F370026E651 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B340E7082EFB60080026E651 /* ManagedSettings.framework in Frameworks */,
+				B340E70B2EFB600A0026E651 /* ManagedSettingsUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +252,9 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				BFEDCBF88985363F24300C53 /* libPods-Unscroller.a */,
+				B340E4F02EFB1EEC0026E651 /* DeviceActivity.framework */,
+				B340E51A2EFB1F370026E651 /* ManagedSettings.framework */,
+				B340E51C2EFB1F370026E651 /* ManagedSettingsUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -87,6 +279,9 @@
 			children = (
 				13B07FAE1A68108700A75B9A /* Unscroller */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
+				B340E4F22EFB1EEC0026E651 /* BlockServiceMonitor */,
+				B340E5042EFB1F160026E651 /* BlockServiceReport */,
+				B340E51E2EFB1F370026E651 /* BlockServiceShield */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				DD74233DEA211F11DACD12E2 /* Pods */,
@@ -101,6 +296,9 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* Unscroller.app */,
+				B340E4EF2EFB1EEC0026E651 /* BlockServiceMonitor.appex */,
+				B340E5032EFB1F160026E651 /* BlockServiceReport.appex */,
+				B340E5192EFB1F370026E651 /* BlockServiceShield.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -128,7 +326,6 @@
 				44C8E9F1A1B784B23E23AFA9 /* Pods-Unscroller.debug.xcconfig */,
 				395BC0C76E396F6DC8EDD5E2 /* Pods-Unscroller.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -147,15 +344,83 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
 				4CC3DE82AEAF0566E5E900ED /* [CP] Embed Pods Frameworks */,
+				B340E4FE2EFB1EED0026E651 /* Embed Foundation Extensions */,
+				B340E5142EFB1F160026E651 /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
+				B340E4EA2EFB1CE30026E651 /* PBXBuildRule */,
 			);
 			dependencies = (
+				B340E4F82EFB1EEC0026E651 /* PBXTargetDependency */,
+				B340E50E2EFB1F160026E651 /* PBXTargetDependency */,
+				B340E5242EFB1F370026E651 /* PBXTargetDependency */,
 			);
 			name = Unscroller;
 			productName = Unscroller;
 			productReference = 13B07F961A680F5B00A75B9A /* Unscroller.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B340E4EE2EFB1EEC0026E651 /* BlockServiceMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B340E4FB2EFB1EED0026E651 /* Build configuration list for PBXNativeTarget "BlockServiceMonitor" */;
+			buildPhases = (
+				B340E4EB2EFB1EEC0026E651 /* Sources */,
+				B340E4EC2EFB1EEC0026E651 /* Frameworks */,
+				B340E4ED2EFB1EEC0026E651 /* Resources */,
+				B340E7072EFB60030026E651 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B340E4F22EFB1EEC0026E651 /* BlockServiceMonitor */,
+			);
+			name = BlockServiceMonitor;
+			productName = BlockServiceMonitor;
+			productReference = B340E4EF2EFB1EEC0026E651 /* BlockServiceMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		B340E5022EFB1F160026E651 /* BlockServiceReport */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B340E5112EFB1F160026E651 /* Build configuration list for PBXNativeTarget "BlockServiceReport" */;
+			buildPhases = (
+				B340E4FF2EFB1F160026E651 /* Sources */,
+				B340E5002EFB1F160026E651 /* Frameworks */,
+				B340E5012EFB1F160026E651 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B340E5042EFB1F160026E651 /* BlockServiceReport */,
+			);
+			name = BlockServiceReport;
+			productName = BlockServiceReport;
+			productReference = B340E5032EFB1F160026E651 /* BlockServiceReport.appex */;
+			productType = "com.apple.product-type.extensionkit-extension";
+		};
+		B340E5182EFB1F370026E651 /* BlockServiceShield */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B340E5272EFB1F370026E651 /* Build configuration list for PBXNativeTarget "BlockServiceShield" */;
+			buildPhases = (
+				B340E5152EFB1F370026E651 /* Sources */,
+				B340E5162EFB1F370026E651 /* Frameworks */,
+				B340E5172EFB1F370026E651 /* Resources */,
+				B340E70A2EFB60080026E651 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B340E51E2EFB1F370026E651 /* BlockServiceShield */,
+			);
+			name = BlockServiceShield;
+			productName = BlockServiceShield;
+			productReference = B340E5192EFB1F370026E651 /* BlockServiceShield.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -163,10 +428,21 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1130;
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1250;
+					};
+					B340E4EE2EFB1EEC0026E651 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					B340E5022EFB1F160026E651 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					B340E5182EFB1F370026E651 = {
+						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
 			};
@@ -184,6 +460,9 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* Unscroller */,
+				B340E4EE2EFB1EEC0026E651 /* BlockServiceMonitor */,
+				B340E5022EFB1F160026E651 /* BlockServiceReport */,
+				B340E5182EFB1F370026E651 /* BlockServiceShield */,
 			);
 		};
 /* End PBXProject section */
@@ -197,6 +476,27 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				98EA755402CA3DDE23AF3B4C /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E4ED2EFB1EEC0026E651 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E5012EFB1F160026E651 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E5172EFB1F370026E651 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,7 +636,46 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B340E4EB2EFB1EEC0026E651 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E4FF2EFB1F160026E651 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B340E5152EFB1F370026E651 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B340E4F82EFB1EEC0026E651 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B340E4EE2EFB1EEC0026E651 /* BlockServiceMonitor */;
+			targetProxy = B340E4F72EFB1EEC0026E651 /* PBXContainerItemProxy */;
+		};
+		B340E50E2EFB1F160026E651 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B340E5022EFB1F160026E651 /* BlockServiceReport */;
+			targetProxy = B340E50D2EFB1F160026E651 /* PBXContainerItemProxy */;
+		};
+		B340E5242EFB1F370026E651 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B340E5182EFB1F370026E651 /* BlockServiceShield */;
+			targetProxy = B340E5232EFB1F370026E651 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
@@ -353,19 +692,21 @@
 					"FB_SONARKIT_ENABLED=1",
 				);
 				INFOPLIST_FILE = Unscroller/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = org.name.CreatorMode;
+				PRODUCT_BUNDLE_IDENTIFIER = org.name.Unscroller;
 				PRODUCT_NAME = Unscroller;
 				SWIFT_OBJC_BRIDGING_HEADER = "Unscroller/Unscroller-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -384,19 +725,21 @@
 				CODE_SIGN_ENTITLEMENTS = Unscroller/Unscroller.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = Unscroller/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NEW_SETTING = "";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = org.name.CreatorMode;
+				PRODUCT_BUNDLE_IDENTIFIER = org.name.Unscroller;
 				PRODUCT_NAME = Unscroller;
 				SWIFT_OBJC_BRIDGING_HEADER = "Unscroller/Unscroller-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -428,6 +771,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -435,6 +779,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = YA7XM97835;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -462,6 +807,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				USE_HERMES = true;
@@ -491,6 +837,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -498,6 +845,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = YA7XM97835;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -517,9 +865,286 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B340E4FC2EFB1EED0026E651 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = BlockServiceMonitor/BlockServiceMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = YA7XM97835;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BlockServiceMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BlockServiceMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = org.name.Unscroller.BlockServiceMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B340E4FD2EFB1EED0026E651 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = BlockServiceMonitor/BlockServiceMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = YA7XM97835;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BlockServiceMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BlockServiceMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = org.name.Unscroller.BlockServiceMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B340E5122EFB1F160026E651 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = BlockServiceReport/BlockServiceReport.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BlockServiceReport/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BlockServiceReport;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = org.name.Unscroller.BlockServiceReport;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B340E5132EFB1F160026E651 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = BlockServiceReport/BlockServiceReport.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BlockServiceReport/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BlockServiceReport;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = org.name.Unscroller.BlockServiceReport;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B340E5282EFB1F370026E651 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = BlockServiceShield/BlockServiceShield.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BlockServiceShield/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BlockServiceShield;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = org.name.Unscroller.BlockServiceShield;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B340E5292EFB1F370026E651 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = BlockServiceShield/BlockServiceShield.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BlockServiceShield/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BlockServiceShield;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
+				PRODUCT_BUNDLE_IDENTIFIER = org.name.Unscroller.BlockServiceShield;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -540,6 +1165,33 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B340E4FB2EFB1EED0026E651 /* Build configuration list for PBXNativeTarget "BlockServiceMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B340E4FC2EFB1EED0026E651 /* Debug */,
+				B340E4FD2EFB1EED0026E651 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B340E5112EFB1F160026E651 /* Build configuration list for PBXNativeTarget "BlockServiceReport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B340E5122EFB1F160026E651 /* Debug */,
+				B340E5132EFB1F160026E651 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B340E5272EFB1F370026E651 /* Build configuration list for PBXNativeTarget "BlockServiceShield" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B340E5282EFB1F370026E651 /* Debug */,
+				B340E5292EFB1F370026E651 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

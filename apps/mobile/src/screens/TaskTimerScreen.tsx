@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SPACING } from '@/core/theme/spacing';
@@ -15,6 +15,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import WatercolorBackdrop from '@/components/watercolor/WatercolorBackdrop';
 import WatercolorCard from '@/components/watercolor/WatercolorCard';
 import WatercolorButton from '@/components/watercolor/WatercolorButton';
+import { useXP } from '@/hooks/useXP';
+import { constellationServiceDB } from '@/services/constellationService.database';
+import { supabase } from '@/services/supabase';
 
 const DEFAULT_DURATION_MIN = 25;
 
@@ -36,18 +39,47 @@ export default function TaskTimerScreen({ navigation, route }: Props) {
   const { taskId, title, durationMin: routeDurationMin, blockSetId: routeBlockSetId } = route.params;
   const [initTimestamp] = useState(() => Date.now());
   const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const [userId, setUserId] = useState<string | null>(null);
+  const [hasAwardedSession, setHasAwardedSession] = useState(false);
+  const [isCompletingSession, setIsCompletingSession] = useState(false);
   const activeTask = useBlockingStore(selectActiveTask);
   const blockSets = useBlockingStore(selectBlockSets);
   const capability = useBlockingStore(selectBlockingCapability);
   const startTask = useBlockingStore(state => state.startTask);
   const stopTask = useBlockingStore(state => state.stopTask);
   const authorize = useBlockingStore(state => state.authorize);
+  const { awardFocusSessionXP } = useXP();
   const durationMin = activeTask?.task.durationMin ?? routeDurationMin ?? DEFAULT_DURATION_MIN;
   const activeBlockSetId = activeTask?.task.blockSetId ?? routeBlockSetId ?? DEFAULT_BLOCK_SET_ID;
   const resolvedBlockSet = useMemo(
     () => blockSets.find(set => set.id === activeBlockSetId) ?? defaultBlockSet,
     [blockSets, activeBlockSetId]
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadUser() {
+      if (!supabase) return;
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.warn('[TaskTimer] Unable to load user', error);
+          return;
+        }
+        if (user && isMounted) {
+          setUserId(user.id);
+        }
+      } catch (error) {
+        console.warn('[TaskTimer] Failed to fetch user', error);
+      }
+    }
+
+    loadUser();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(Date.now()), 1000);
@@ -77,6 +109,47 @@ export default function TaskTimerScreen({ navigation, route }: Props) {
       });
     };
   }, [activeTask?.task.id, durationMin, initTimestamp, resolvedBlockSet.id, startTask, stopTask, taskId, title]);
+
+  const awardSessionRewards = useCallback(async () => {
+    if (hasAwardedSession) {
+      return;
+    }
+    setHasAwardedSession(true);
+
+    try {
+      await awardFocusSessionXP();
+    } catch (error) {
+      console.warn('[TaskTimer] Failed to award focus session XP', error);
+    }
+
+    if (!userId) {
+      console.warn('[TaskTimer] Cannot award star without authenticated user');
+      return;
+    }
+
+    try {
+      await constellationServiceDB.awardFocusSessionStar(userId, durationMin);
+    } catch (error) {
+      console.warn('[TaskTimer] Failed to award focus session star', error);
+    }
+  }, [awardFocusSessionXP, durationMin, hasAwardedSession, userId]);
+
+  const handleEndSession = useCallback(async () => {
+    if (isCompletingSession) {
+      return;
+    }
+
+    setIsCompletingSession(true);
+    try {
+      await stopTask(taskId);
+      await awardSessionRewards();
+    } catch (error) {
+      console.warn('[TaskTimer] Failed to complete session', error);
+    } finally {
+      setIsCompletingSession(false);
+      navigation.goBack();
+    }
+  }, [awardSessionRewards, isCompletingSession, navigation, stopTask, taskId]);
 
   const remainingLabel = formatRemaining(activeTask?.remainingMs, activeTask?.startedAt ?? initTimestamp, durationMin, currentTime);
 
@@ -113,9 +186,7 @@ export default function TaskTimerScreen({ navigation, route }: Props) {
 
             <WatercolorButton
               color="yellow"
-              onPress={() => {
-                stopTask(taskId).finally(() => navigation.goBack());
-              }}
+              onPress={handleEndSession}
               style={styles.primaryButton}
             >
               <Text style={styles.primaryButtonText}>End Session</Text>

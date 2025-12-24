@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect, useMemo, useCallback } from 'react';
+import { View, StyleSheet, Dimensions, TouchableOpacity, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Line } from 'react-native-svg';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -17,7 +17,10 @@ import type { Star, SkyState } from '@/services/constellationService.database';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MAX_RENDERED_STARS = 180;
 
-const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+const clamp = (value: number, min: number, max: number) => {
+  'worklet';
+  return Math.min(Math.max(value, min), max);
+};
 
 const hashString = (input: string) => {
   let hash = 0;
@@ -365,19 +368,29 @@ export function ConstellationSky({ skyState, compact = false, onStarPress, enabl
   // Base viewport that matches the framed sky height on MySky
   const viewportHeight = compact ? 240 : SCREEN_HEIGHT * 0.45;
   const viewportWidth = SCREEN_WIDTH;
-  const panPadding = enableGestures && !compact ? viewportWidth * 0.3 : 0;
-  const containerHeight = viewportHeight + panPadding * 2;
-  const containerWidth = viewportWidth + panPadding * 2;
-  const universeScaleStyle = !compact ? { transform: [{ scale: stage.scale }] as const } : undefined;
+  const backgroundPaddingX = enableGestures && !compact ? viewportWidth * 1.1 : viewportWidth * 0.35;
+  const backgroundPaddingY = enableGestures && !compact ? viewportHeight * 0.65 : viewportHeight * 0.18;
+  const containerHeight = viewportHeight + backgroundPaddingY * 2;
+  const containerWidth = viewportWidth + backgroundPaddingX * 2;
+  const baseScale = !compact ? 0.78 + stage.energy * 0.035 : 1;
+  const universeScaleStyle = !compact ? { transform: [{ scale: baseScale }] as const } : undefined;
 
   // Pan and zoom gesture values
-  const initialTranslate = enableGestures && !compact ? -panPadding : 0;
-  const translateX = useSharedValue(initialTranslate);
-  const translateY = useSharedValue(initialTranslate);
-  const scale = useSharedValue(1);
-  const savedTranslateX = useSharedValue(initialTranslate);
-  const savedTranslateY = useSharedValue(initialTranslate);
-  const savedScale = useSharedValue(1);
+  const initialTranslateX = enableGestures && !compact ? -backgroundPaddingX : 0;
+  const initialTranslateY = enableGestures && !compact ? -backgroundPaddingY : 0;
+  const initialZoom = enableGestures && !compact ? 0.85 : 1;
+  const translateX = useSharedValue(initialTranslateX);
+  const translateY = useSharedValue(initialTranslateY);
+  const scale = useSharedValue(initialZoom);
+  const savedTranslateX = useSharedValue(initialTranslateX);
+  const savedTranslateY = useSharedValue(initialTranslateY);
+  const savedScale = useSharedValue(initialZoom);
+  const minTranslateX = initialTranslateX - backgroundPaddingX * 0.9;
+  const maxTranslateX = initialTranslateX + backgroundPaddingX * 0.9;
+  const minTranslateY = initialTranslateY - backgroundPaddingY * 0.9;
+  const maxTranslateY = initialTranslateY + backgroundPaddingY * 0.9;
+  const MIN_ZOOM = 0.65;
+  const MAX_ZOOM = 2.4;
 
   // Pinch gesture for zoom
   const pinchGesture = Gesture.Pinch()
@@ -386,8 +399,8 @@ export function ConstellationSky({ skyState, compact = false, onStarPress, enabl
       scale.value = savedScale.value * event.scale;
     })
     .onEnd(() => {
-      // Clamp scale between 0.5x and 3x
-      scale.value = withSpring(Math.max(0.5, Math.min(3, scale.value)));
+      // Clamp scale between min/max to prevent runaway zoom
+      scale.value = withSpring(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, scale.value)));
       savedScale.value = scale.value;
     });
 
@@ -397,8 +410,8 @@ export function ConstellationSky({ skyState, compact = false, onStarPress, enabl
     .onUpdate((event) => {
       const nextX = savedTranslateX.value + event.translationX;
       const nextY = savedTranslateY.value + event.translationY;
-      translateX.value = clamp(nextX, initialTranslate - panPadding, initialTranslate + panPadding);
-      translateY.value = clamp(nextY, initialTranslate - panPadding, initialTranslate + panPadding);
+      translateX.value = clamp(nextX, minTranslateX, maxTranslateX);
+      translateY.value = clamp(nextY, minTranslateY, maxTranslateY);
     })
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
@@ -516,6 +529,18 @@ export function ConstellationSky({ skyState, compact = false, onStarPress, enabl
     </View>
   );
 
+  const adjustZoom = useCallback(
+    (direction: 'in' | 'out') => {
+      if (!enableGestures || compact) return;
+
+      const delta = direction === 'in' ? 0.18 : -0.18;
+      const next = clamp(scale.value + delta, MIN_ZOOM, MAX_ZOOM);
+      scale.value = withSpring(next);
+      savedScale.value = next;
+    },
+    [compact, enableGestures, scale, savedScale]
+  );
+
   if (enableGestures && !compact) {
     return (
       <GestureDetector gesture={composedGesture}>
@@ -523,6 +548,14 @@ export function ConstellationSky({ skyState, compact = false, onStarPress, enabl
           <Animated.View style={[{ width: containerWidth, height: containerHeight }, panZoomStyle]}>
             {skyContent}
           </Animated.View>
+          <View style={styles.zoomControls}>
+            <TouchableOpacity style={styles.zoomButton} onPress={() => adjustZoom('in')}>
+              <Text style={styles.zoomText}>＋</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.zoomButton} onPress={() => adjustZoom('out')}>
+              <Text style={styles.zoomText}>－</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </GestureDetector>
     );
@@ -987,10 +1020,31 @@ const styles = StyleSheet.create({
   },
   halo: {
     position: 'absolute',
-    borderRadius: 100,
+    borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.3)',
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderStyle: 'solid',
+  },
+  zoomControls: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    flexDirection: 'column',
+    gap: 12,
+  },
+  zoomButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: 'rgba(10, 7, 18, 0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  zoomText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '600',
   },
   auroraWave: {
     position: 'absolute',

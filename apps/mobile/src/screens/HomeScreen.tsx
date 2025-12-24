@@ -13,12 +13,14 @@ import {
 import paperTexture from '../../assets/images/paper-texture.jpg';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '@/navigation/AppNavigator';
 import { PROVIDERS } from '@/constants/providers';
 import type { ProviderId } from '@/types';
 import { useAppStore } from '@/store';
 import { challengesService } from '@/services/challengesService';
 import { supabase, isSupabaseConfigured } from '@/services/supabase';
+import { constellationServiceDB } from '@/services/constellationService.database';
 import todoServiceDB from '@/services/todoService.database';
 import {
   useBlockingStore,
@@ -389,7 +391,7 @@ const BOTTOM_NAV: { key: string; Icon: IconComponent; action: (nav: Props['navig
 
 export default function HomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const streakDays = 5;
+  const [streakDays, setStreakDays] = useState(0);
   const lastScrollDate = useAppStore(state => state.lastScrollTimestamp);
   
   // Force status bar to dark-content on screen focus
@@ -415,6 +417,7 @@ export default function HomeScreen({ navigation }: Props) {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     return diffDays > 0 ? diffDays : 0;
   }, [lastScrollDate, today]);
+  const displayedStreak = streakDays > 0 ? streakDays : scrollFreeDays;
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const isCompactVertical = screenHeight < 740;
   const isCompactHorizontal = screenWidth < 360;
@@ -510,6 +513,41 @@ export default function HomeScreen({ navigation }: Props) {
   useEffect(() => {
     loadTodoSummary();
   }, [loadTodoSummary]);
+
+  const loadStreak = useCallback(async () => {
+    if (!isSupabaseConfigured() || !supabase) {
+      setStreakDays(scrollFreeDays);
+      return;
+    }
+
+    try {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error) {
+        throw error;
+      }
+
+      if (!user) {
+        setStreakDays(scrollFreeDays);
+        return;
+      }
+
+      const skyState = await constellationServiceDB.getSkyState(user.id);
+      setStreakDays(skyState.currentStreak || scrollFreeDays);
+    } catch (error) {
+      console.warn('[Home] Failed to load streak', error);
+      setStreakDays(scrollFreeDays);
+    }
+  }, [scrollFreeDays]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadStreak();
+    }, [loadStreak])
+  );
 
   useEffect(() => {
     setFocusLauncher(prev => {
@@ -663,7 +701,7 @@ export default function HomeScreen({ navigation }: Props) {
               </View>
               <View style={styles.headerRight}>
                 <View style={styles.streakBadge}>
-                  <Text style={styles.streakBadgeNumber}>{streakDays}</Text>
+                  <Text style={styles.streakBadgeNumber}>{displayedStreak}</Text>
                   <Flame size={16} color="#f97316" />
                 </View>
                 <TouchableOpacity

@@ -91,6 +91,8 @@ export interface BlockingState {
   activeTask: ActiveTaskState | null;
   lastUsageSummary: UsageSummary | null;
   lastUsageFetchedAt: number | null;
+  getPermissionState: () => Promise<{ usage: boolean; accessibility: boolean; overlay: boolean }>;
+  showUsageReport: () => Promise<void>;
   serviceAuthorized: boolean;
   shieldsAvailable: boolean;
   blockingPauseUntil: number | null;
@@ -515,6 +517,19 @@ export const useBlockingStore = create<BlockingState>()(
         }
       },
 
+      getPermissionState: async () => {
+        if (!isNativeBlockServiceAvailable) {
+          warnNativeUnavailable();
+          return { usage: false, accessibility: false, overlay: false };
+        }
+        try {
+          return await BlockService.getPermissionState();
+        } catch (error) {
+          console.warn('[BlockService] getPermissionState failed', error);
+          return { usage: false, accessibility: false, overlay: false };
+        }
+      },
+
       refreshUsageSummary: async (fromTs, toTs) => {
         if (!isNativeBlockServiceAvailable) {
           warnNativeUnavailable();
@@ -526,6 +541,18 @@ export const useBlockingStore = create<BlockingState>()(
           set({ lastUsageSummary: summary, lastUsageFetchedAt: Date.now() });
         } catch (error) {
           console.warn('[BlockService] getUsageSummary failed', error);
+        }
+      },
+
+      showUsageReport: async () => {
+        if (!isNativeBlockServiceAvailable) {
+          warnNativeUnavailable();
+          return;
+        }
+        try {
+          await BlockService.showUsageReport();
+        } catch (error) {
+          console.warn('[BlockService] showUsageReport failed', error);
         }
       },
     }),
